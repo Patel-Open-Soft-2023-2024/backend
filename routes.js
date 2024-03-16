@@ -1,11 +1,11 @@
 const express = require('express');
 const { getMovies } = require('./controllers/moviesController');
-const { autoComplete } = require('./controllers/searchController');
+const { autoComplete2 } = require('./controllers/searchController');
 
 const router = express.Router();
 
 router.get("/movie/:id", getMovies);
-router.get("/search", autoComplete);
+router.get("/search", autoComplete2);
 
 router.post("/", (req, res)=>{
     console.log(req.body);
