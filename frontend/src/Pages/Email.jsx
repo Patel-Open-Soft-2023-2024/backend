@@ -1,9 +1,9 @@
 import { signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
-import { auth } from  '../firebase/firebaseConfig'
+import { auth } from  '../firebase'
 
 import React, { useState } from 'react';
 
-function EmailSignIn() {
+function Email() {
   // State variables to hold email and password values
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -17,6 +17,8 @@ function EmailSignIn() {
         signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
             const user = userCredential.user;
+            const token = user.accessToken;
+            localStorage.setItem("@token", token);
             console.log(user);
         })
         .catch((error) => {
@@ -64,4 +66,4 @@ function EmailSignIn() {
     );
 }
 
-export default EmailSignIn;
+export default Email;
