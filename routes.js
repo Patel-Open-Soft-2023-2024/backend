@@ -1,5 +1,5 @@
 const express = require('express');
-const { getSimilarMovies } = require('./controllers/moviesController');
+const { getSimilarMovies, getMovies } = require('./controllers/moviesController');
 const { autoComplete, getSemanticSearch } = require('./controllers/searchController');
 const { isAuthenticated } = require('./middleware/isAuthenticated');
 const { getUsers, getUserById, updateUser, createUser, deleteUser, addMovieToWatchlist, removeMovieFromWatchlist } = require('./controllers/userController');
