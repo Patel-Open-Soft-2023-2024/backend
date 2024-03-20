@@ -1,11 +1,11 @@
-const { createClient } = require('redis');
-const { subscribe } = require('../routes');
+const { createClient } = require("redis");
+require("dotenv").config({ path: "./config.env" });
 
 const client = createClient({
-    password: 'G0SpRjh3HW8pCCjYcjHlrVJ2KYtQRj3E',
+    password: `${process.env.REDIS_CLIENT_PASSWORD}`,
     socket: {
-        host: 'redis-17927.c212.ap-south-1-1.ec2.cloud.redislabs.com',
-        port: 17927
+        host: `${process.env.REDIS_CLIENT_HOST}`,
+        port: process.env.REDIS_CLIENT_PORT
     }
 });
 
@@ -41,6 +41,7 @@ const checkMovie = async (id) => {
         console.error('Error checking movie:', err);
     }
 }
+
 const getMovie = async (id) => {
     try {
         const result2 = await client.hGet('movie:' + id,'movie_list');
@@ -52,13 +53,16 @@ const getMovie = async (id) => {
     
 }
 
-const subscribe_=async(req,res)=>{
-    client.subscribe('channel1', (message) => {
-        console.log(`Received message: ${message}`);
-        res.json({message:message})
-    });
 
-    
+const publishMessage = async (req, res) => {
+    try{
+        await redisClient.publish("channel1", JSON.stringify(req.body));
+        console.log("PUBLISHED!");
+        res.json("published");
+    }
+    catch(error){
+        console.log("publishing error", error);
+    }
 }
-module.exports = { storeMovie, getMovie , checkMovie,subscribe_}
-// module.exports = client;
+
+module.exports = { storeMovie, getMovie , checkMovie, publishMessage}
