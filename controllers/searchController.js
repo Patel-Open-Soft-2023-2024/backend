@@ -30,14 +30,15 @@ const autoComplete = async (req, res) => {
                                 "path": "title",
                                 "tokenOrder": "sequential",
                             }
-                        },
-                        {
-                            "autocomplete": {
-                                "query": `${req.query.movie}`,
-                                "path": "fullplot",
-                                "tokenOrder": "sequential"
-                            }
                         }
+                        // ,
+                        // {
+                        //     "autocomplete": {
+                        //         "query": `${req.query.movie}`,
+                        //         "path": "fullplot",
+                        //         "tokenOrder": "sequential"
+                        //     }
+                        // }
                     ]
                 }
             }

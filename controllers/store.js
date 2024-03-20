@@ -1,6 +1,5 @@
-// const { Redis } = require('ioredis')
-// const client = new Redis()
-const { createClient } = require('redis')
+const { createClient } = require('redis');
+const { subscribe } = require('../routes');
 
 const client = createClient({
     password: 'G0SpRjh3HW8pCCjYcjHlrVJ2KYtQRj3E',
@@ -53,5 +52,13 @@ const getMovie = async (id) => {
     
 }
 
-module.exports = { storeMovie, getMovie , checkMovie}
+const subscribe_=async(req,res)=>{
+    client.subscribe('channel1', (message) => {
+        console.log(`Received message: ${message}`);
+        res.json({message:message})
+    });
+
+    
+}
+module.exports = { storeMovie, getMovie , checkMovie,subscribe_}
 // module.exports = client;

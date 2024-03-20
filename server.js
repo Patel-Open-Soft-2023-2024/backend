@@ -12,7 +12,7 @@ app.use(cors());
 app.use(routes);
 
 mongoUtil.connectToCluster().then(()=>{
-    app.listen(process.env.PORT, ()=>{
+    app.listen(process.env.PORT, () => {
         console.log("Listening on port", process.env.PORT);
     })
 })
