@@ -1,25 +1,56 @@
-const { Redis } = require('ioredis')
-const client = new Redis()
+// const { Redis } = require('ioredis')
+// const client = new Redis()
+const { createClient } = require('redis')
 
-// async function ()
-// {
-//     await client.set('message:6', 'Hello, world!');
-//     const result = await client.get('message:6');
-//     console.log("Result ->",result);
-// }
-const storeMovie = async (id,movie_list) => {
-    await client.hset(
-    'movie:'+id,
-     movie_list
-    )
+const client = createClient({
+    password: 'G0SpRjh3HW8pCCjYcjHlrVJ2KYtQRj3E',
+    socket: {
+        host: 'redis-17927.c212.ap-south-1-1.ec2.cloud.redislabs.com',
+        port: 17927
+    }
+});
+
+client.on('error', err => console.error('Redis Client Error:', err));
+async function initializeRedis() {
+    try {
+        await client.connect();
+        console.log('Redis connection established successfully.'); 
+    } catch (err) {
+        console.error('Redis connection error:', err);
+    }
+}
+
+initializeRedis(); // Call to establish the connection
+
+const storeMovie = async (id, movie_list) => {
+    try {
+        // console.log(movie_list[0].plot);
+        await client.hSet(
+            'movie:' + id,
+            { 'movie_list': JSON.stringify(movie_list[0]) },
+        );
+    } catch (err) {
+        console.error('Error storing movie:', err);
+    }
+    
 }
 const checkMovie = async (id) => {
-    const result = await client.hexists('movie:' + id, '_id');
-    return result;
+    try {
+        const result = await client.hExists('movie:' + id, 'movie_list');
+        return result;
+    } catch (err) {
+        console.error('Error checking movie:', err);
+    }
 }
 const getMovie = async (id) => {
-    const result2 = await client.hgetall('movie:'+id);
-    return result2;
+    try {
+        const result2 = await client.hGet('movie:' + id,'movie_list');
+        return JSON.parse(result2);
+    }
+    catch (err) {
+        console.error('Error getting movie:', err);
+    }
+    
 }
 
 module.exports = { storeMovie, getMovie , checkMovie}
