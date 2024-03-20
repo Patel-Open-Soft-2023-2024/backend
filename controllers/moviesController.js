@@ -1,6 +1,6 @@
 const { ObjectId } = require("mongodb");
 const mongoUtil = require("../utils/mongoUtil");
-const {storeMovie, getMovie , checkMovie}=require('./store')
+const { checkMovie, getMovie, storeMovie } = require("./redisController");
 
 const getMovies = async (req, res) => {
     const { id } = req.params;

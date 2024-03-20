@@ -2,6 +2,7 @@ const express = require('express');
 const { getMovies, getSimilarMovies } = require('./controllers/moviesController');
 const { autoComplete, getSemanticSearch } = require('./controllers/searchController');
 const { isAuthenticated } = require('./middleware/isAuthenticated');
+const { publishMessage } = require('./controllers/redisController');
 
 const router = express.Router();
 
@@ -19,6 +20,7 @@ router.get("/movie/:id", getMovies);
 router.get("/search", autoComplete);
 router.post("/search/semantic", getSemanticSearch);
 router.get("/movie/similar/:id", getSimilarMovies);
+router.post("/publish", publishMessage);
 
 router.get("/private", isAuthenticated, (req, res) => {
     res.json(req.user);
