@@ -4,6 +4,7 @@ const { autoComplete, getSemanticSearch } = require('./controllers/searchControl
 const { isAuthenticated } = require('./middleware/isAuthenticated');
 const { getUsers, getUserById, updateUser, createUser, deleteUser, addMovieToWatchlist, removeMovieFromWatchlist } = require('./controllers/userController');
 const { publishMessage } = require('./controllers/redisController');
+const { getHome } = require('./controllers/homeController');
 
 const router = express.Router();
 
@@ -17,6 +18,7 @@ router.post("/", async (req, res) => {
 })
 //------------------------------------------------
 
+router.get("/home", getHome);
 router.get("/movie/:id", getMovies);
 router.get("/search", autoComplete);
 router.post("/search/semantic", getSemanticSearch);
