@@ -47,7 +47,13 @@ const autoComplete = async (req, res) => {
             "$project": {
                 "title": 1,
                 "fullplot": 1,
-                "score": { "$meta": "searchScore" }
+                "score": { "$meta": "searchScore" },
+                'genres':1,
+                'poster':1,
+                'languages':1,
+                'imdb':1,
+                'year':1,
+                'directors':1
             }
         },
         { "$sort": { "len": -1, "score": -1 } },
@@ -97,7 +103,13 @@ const getSemanticSearch = async (req, res) => {
                         'title': 1,
                         'score': {
                             '$meta': 'vectorSearchScore'
-                        }
+                        },
+                        'genres':1,
+                        'poster':1,
+                        'languages':1,
+                        'imdb':1,
+                        'year':1,
+                        'directors':1
                     }
                 }
             ];

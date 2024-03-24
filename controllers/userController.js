@@ -1,5 +1,7 @@
 const mongoUtil = require('../utils/mongoUtil');
 const { ObjectId } = require('mongodb'); 
+const { auth } = require('../utils/firebaseUtil.js');
+const { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } = require('firebase/auth');
 
 const createUser = async (req, res) => {
     try {
@@ -113,4 +115,68 @@ const removeMovieFromWatchlist = async (req, res) => {
     }
 };
 
-module.exports = { createUser, getUsers, getUserById, updateUser, deleteUser,addMovieToWatchlist,removeMovieFromWatchlist};
+const login = async (req, res) => {
+    signInWithEmailAndPassword(auth, req.body.email, req.body.password).then((userCredential) => {
+        const user = userCredential.user;
+        console.log(user);
+        res.status(200).json(user);
+    }).catch((error) => {
+        console.log(error.message);
+    });
+}
+
+const signup = async (req, res) => {
+    createUserWithEmailAndPassword(auth, req.body.email, req.body.password).then((userCredential) => {
+        const user = userCredential.user;
+        console.log(user);
+        try {
+            const users = mongoUtil.getDB().collection("users");
+            const newUser = {
+                uid: user.uid,
+                name: req.body.name,
+                email: req.body.email,
+                watchlist: []
+            
+            };
+            newUser._id=new ObjectId(newUser._id)
+            const result = users.insertOne(newUser);
+            res.status(201).json(result);
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: "Internal server error" });
+        }
+        // req.uid = user.uid;
+        // createUser(req, res);
+    }
+    ).catch((error) => {
+        console.log(error.message);
+    });
+    
+}
+
+const logout = async (req, res) => {
+    signOut(auth).then(() => {
+        console.log("User signed out");
+        res.status(200).json({ message: "User signed out" });
+    }).catch((error) => {
+        console.log(error.message);
+    });
+};
+
+const googleLogin = async (req, res) => {
+    const provider = new GoogleAuthProvider();
+    signInWithPopup(auth, provider).then((result) => {
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const token = credential.accessToken;
+        const user = result.user;
+        console.log(user);
+    }).catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        const email = error.email;
+        const credential = GoogleAuthProvider.credentialFromError(error);
+        console.log(errorMessage);
+    });
+};
+
+module.exports = { createUser, getUsers, getUserById, updateUser, deleteUser, addMovieToWatchlist, removeMovieFromWatchlist, login, signup, logout, googleLogin };

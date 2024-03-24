@@ -2,7 +2,7 @@ const express = require('express');
 const { getSimilarMovies, getMovies } = require('./controllers/moviesController');
 const { autoComplete, getSemanticSearch } = require('./controllers/searchController');
 const { isAuthenticated } = require('./middleware/isAuthenticated');
-const { getUsers, getUserById, updateUser, createUser, deleteUser, addMovieToWatchlist, removeMovieFromWatchlist } = require('./controllers/userController');
+const { getUsers, getUserById, updateUser, createUser, deleteUser, addMovieToWatchlist, removeMovieFromWatchlist, login, googleLogin, logout, signup } = require('./controllers/userController');
 const { publishMessage } = require('./controllers/redisController');
 const { getHome } = require('./controllers/homeController');
 
@@ -33,6 +33,10 @@ router.delete("/deleteuser:id", deleteUser);
 router.post("/addmovie:id", addMovieToWatchlist);
 router.post("/removie:id", removeMovieFromWatchlist);
 router.post("/publish", publishMessage);
+router.post("/login", login);
+router.post("/signup", signup);
+router.get("/logout", logout);
+router.get("/googlelogin", googleLogin);
 
 router.get("/private", isAuthenticated, (req, res) => {
     res.json(req.user);
