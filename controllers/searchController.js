@@ -7,7 +7,7 @@ const autoComplete = async (req, res) => {
     const pipeline = [
         {
             "$search": {
-                "index": "default",
+                "index": "newIndex",
                 "compound": {
                     "should": [
                         {
@@ -17,11 +17,20 @@ const autoComplete = async (req, res) => {
                                 "score": { "boost": { "value": 5 } }
                             }
                         },
+                        // {
+                        //     "phrase": {
+                        //         "query": `${req.query.movie}`,
+                        //         "path": "title",
+                        //         "score": { "boost": { "value": 5 } }
+                        //     }
+                        // },
                         {
-                            "phrase": {
+                            "text": {
                                 "query": `${req.query.movie}`,
                                 "path": "title",
-                                "score": { "boost": { "value": 5 } }
+                                "fuzzy": {
+                                    "maxEdits": 2,
+                                }
                             }
                         },
                         {
@@ -55,7 +64,6 @@ const autoComplete = async (req, res) => {
             "$limit": 20
         },
     ]
-
     const data = await movies.aggregate(pipeline).toArray();
     res.status(200).json({ data: data });
 }
