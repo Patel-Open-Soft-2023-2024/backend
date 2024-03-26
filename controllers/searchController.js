@@ -1,4 +1,4 @@
-require("dotenv").config({path: "../config.env"});
+require("dotenv").config({ path: "../config.env" });
 const mongoUtil = require('../utils/mongoUtil')
 
 const autoComplete = async (req, res) => {
@@ -10,24 +10,43 @@ const autoComplete = async (req, res) => {
                 "index": "newIndex",
                 "compound": {
                     "should": [
+                        // {
+                        // 'equals': {
+                        //     "path": 'cast',
+                        //     "value": `${req.query.movie}`,
+                        //     "score": { "boost": { "value": 5 } }
+                        // }
+                        // },
                         {
-                            'equals': {
-                                "path": 'title',
-                                "value": `${req.query.movie}`,
-                                "score": { "boost": { "value": 5 } }
+                            "phrase": {
+                                "query": `${req.query.movie}`,
+                                "path": "title",
+                                // "score": { "boost": { "value": 2 } }
                             }
                         },
-                        // {
-                        //     "phrase": {
-                        //         "query": `${req.query.movie}`,
-                        //         "path": "title",
-                        //         "score": { "boost": { "value": 5 } }
-                        //     }
-                        // },
                         {
                             "text": {
                                 "query": `${req.query.movie}`,
                                 "path": "title",
+                                "fuzzy": {
+                                    "maxEdits": 2,
+                                },
+                                // "score": { "boost": { "value": 2 } }
+                            }
+                        },
+                        {
+                            "text": {
+                                "query": `${req.query.movie}`,
+                                "path": "cast",
+                                "fuzzy": {
+                                    "maxEdits": 2,
+                                }
+                            }
+                        },
+                        {
+                            "text": {
+                                "query": `${req.query.movie}`,
+                                "path": "directors",
                                 "fuzzy": {
                                     "maxEdits": 2,
                                 }
@@ -39,12 +58,11 @@ const autoComplete = async (req, res) => {
                                 "path": "title",
                                 "tokenOrder": "sequential",
                             }
-                        }
-                        // ,
+                        },
                         // {
                         //     "autocomplete": {
                         //         "query": `${req.query.movie}`,
-                        //         "path": "fullplot",
+                        //         "path": "cast",
                         //         "tokenOrder": "sequential"
                         //     }
                         // }
@@ -59,7 +77,7 @@ const autoComplete = async (req, res) => {
                 "score": { "$meta": "searchScore" }
             }
         },
-        { "$sort": { "len": -1, "score": -1 } },
+        { "$sort": { "score": -1 } },
         {
             "$limit": 20
         },
@@ -120,7 +138,7 @@ const getSemanticSearch = async (req, res) => {
     }
     catch (error) {
         console.log(error);
-        res.status(400).json({error: error, "message": "Unable to process the request now."});
+        res.status(400).json({ error: error, "message": "Unable to process the request now." });
     }
 }
 

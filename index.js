@@ -10,7 +10,7 @@ async function run() {
     try {
         const database = client.db('sample_mflix');
         const movies = database.collection('movies');
-        
+
         // Query for a movie that has the title 'Back to the Future'
         const pipeline = [
             {
@@ -27,14 +27,14 @@ async function run() {
                             },
                             // {
                             //     "phrase": {
-                                //         "query": `Titanic`,
-                                //         "path": "title",
-                                //         "score": { "boost": { "value": 5 } }
-                                //     }
-                                // },
-                                // {
-                                    //     "text": {
-                                        //         "query": `Titanic`,
+                            //         "query": `Titanic`,
+                            //         "path": "title",
+                            //         "score": { "boost": { "value": 5 } }
+                            //     }
+                            // },
+                            // {
+                            //     "text": {
+                            //         "query": `Titanic`,
                             //         "path": "title",
                             //         "fuzzy": {
                             //             "maxEdits": 2,
@@ -43,17 +43,17 @@ async function run() {
                             // },
                             // {
                             //     "autocomplete": {
-                                //         "query": `Titanic`,
-                                //         "path": "title",
-                                //         "tokenOrder": "sequential",
-                                //     }
+                            //         "query": `Titanic`,
+                            //         "path": "title",
+                            //         "tokenOrder": "sequential",
+                            //     }
                             // }
                             // ,
                             // {
-                                //     "autocomplete": {
-                                    //         "query": `Titanic`,
-                                    //         "path": "fullplot",
-                                    //         "tokenOrder": "sequential"
+                            //     "autocomplete": {
+                            //         "query": `Titanic`,
+                            //         "path": "fullplot",
+                            //         "tokenOrder": "sequential"
                             //     }
                             // }
                         ]
@@ -83,78 +83,84 @@ async function run() {
         // await client.close();
     }
 }
-async function a(){
+async function a() {
     console.log('Connected');
     const movies = client.db("sample_mflix").collection("movies");
     // Query for a movie that has the title 'Back to the Future'
-    const pipeline = [
+    // const pipeline = [
+    //     {
+    //         "$search": {
+    //             "index": "default",
+    //             "compound": {
+    //                 "should": [
+    //                     {
+    //                         'text': {
+    //                             "path": 'title',
+    //                             "query": `Titani`,
+    //                             "fuzzy": {
+    //                                 "maxEdits": 2,
+    //                             },
+    //                             "score": { "boost": { "value": 5 } }
+    //                         }
+    //                     },
+    //                     // {
+    //                     //     "phrase": {
+    //                         //         "query": `Titanic`,
+    //                         //         "path": "title",
+    //                         //         "score": { "boost": { "value": 5 } }
+    //                         //     }
+    //                         // },
+    //                         // {
+    //                             //     "text": {
+    //                                 //         "query": `Titanic`,
+    //                     //         "path": "title",
+    //                     //         "fuzzy": {
+    //                     //             "maxEdits": 2,
+    //                     //         }
+    //                     //     }
+    //                     // },
+    //                     // {
+    //                     //     "autocomplete": {
+    //                         //         "query": `Titanic`,
+    //                         //         "path": "title",
+    //                         //         "tokenOrder": "sequential",
+    //                         //     }
+    //                     // }
+    //                     // ,
+    //                     // {
+    //                         //     "autocomplete": {
+    //                             //         "query": `Titanic`,
+    //                             //         "path": "fullplot",
+    //                             //         "tokenOrder": "sequential"
+    //                     //     }
+    //                     // }
+    //                 ]
+    //             }
+    //         }
+    //     },
+    //     {
+    //         "$project": {
+    //             "title": 1,
+    //             "fullplot": 1,
+    //             "score": { "$meta": "searchScore" }
+    //         }
+    //     },
+    //     { "$sort": { "score": -1 } },
+    //     {
+    //         "$limit": 5
+    //     },
+    // ]
+    // movies.aggregate(pipeline).toArray().then(data => { console.log(data, 'data'); }).catch(err => console.error(err, 'error'));
+    movies.find(
         {
-            "$search": {
-                "index": "default",
-                "compound": {
-                    "should": [
-                        {
-                            'text': {
-                                "path": 'title',
-                                "query": `Titani`,
-                                "fuzzy": {
-                                    "maxEdits": 2,
-                                },
-                                "score": { "boost": { "value": 5 } }
-                            }
-                        },
-                        // {
-                        //     "phrase": {
-                            //         "query": `Titanic`,
-                            //         "path": "title",
-                            //         "score": { "boost": { "value": 5 } }
-                            //     }
-                            // },
-                            // {
-                                //     "text": {
-                                    //         "query": `Titanic`,
-                        //         "path": "title",
-                        //         "fuzzy": {
-                        //             "maxEdits": 2,
-                        //         }
-                        //     }
-                        // },
-                        // {
-                        //     "autocomplete": {
-                            //         "query": `Titanic`,
-                            //         "path": "title",
-                            //         "tokenOrder": "sequential",
-                            //     }
-                        // }
-                        // ,
-                        // {
-                            //     "autocomplete": {
-                                //         "query": `Titanic`,
-                                //         "path": "fullplot",
-                                //         "tokenOrder": "sequential"
-                        //     }
-                        // }
-                    ]
-                }
-            }
-        },
-        {
-            "$project": {
-                "title": 1,
-                "fullplot": 1,
-                "score": { "$meta": "searchScore" }
-            }
-        },
-        { "$sort": { "score": -1 } },
-        {
-            "$limit": 5
-        },
-    ]
-    movies.aggregate(pipeline).toArray().then(data => { console.log(data, 'data'); }).catch(err => console.error(err, 'error'));
+            cast: { $elemMatch:  "christopher"  }
+        }
+    ).then(data => { console.log(data, 'data'); })
+
     // const query = { title: 'Back to the Future' };
     // const movie = await movies.findOne(query);
     // console.log(movie);
 }
 // run().catch(console.dir);
 console.log("--")
-client.connect().then(() => {console.log('Connected');a()}).catch(err => console.error(err, 'error'));
+client.connect().then(() => { console.log('Connected'); a() }).catch(err => console.error(err, 'error'));

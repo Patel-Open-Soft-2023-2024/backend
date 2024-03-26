@@ -18,6 +18,7 @@ const getMovies = async (req, res) => {
     // await storeMovie(id, movieDetails);
     console.log("From DB");
     res.status(200).json({ data: movieDetails });
+    console.log(movieDetails);
   // }
 }
 

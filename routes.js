@@ -24,12 +24,12 @@ router.get("/movie/similar/:id", getSimilarMovies);
 
 // USER ROUTES
 router.get("/getalluser", getUsers);
-router.get("/getuser:id", getUserById);
+router.get("/getuser/:id", getUserById);
 router.post("/updateuser", updateUser);
 router.post("/createuser", createUser);
-router.delete("/deleteuser:id", deleteUser);
-router.post("/addmovie:id", addMovieToWatchlist);
-router.post("/removie:id", removeMovieFromWatchlist);
+router.delete("/deleteuser/:id", deleteUser);
+router.post("/addmovie/:id", addMovieToWatchlist);
+router.post("/removie/:id", removeMovieFromWatchlist);
 // router.post("/publish", publishMessage);
 
 router.get("/private", isAuthenticated, (req, res) => {
