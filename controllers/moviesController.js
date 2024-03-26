@@ -23,10 +23,11 @@ const getMovies = async (req, res) => {
 
 const getSimilarMovies = async (req, res) => {
   const { id } = req.params;
+  console.log(id);
   const _id = ObjectId.createFromHexString(id);
   const movieDB = mongoUtil.getDB().collection("embedded_movies");
   const vector_embeddings = await movieDB.find({ _id }).project({ "plot_embedding": 1, "_id": 0 }).toArray();
-  console.log(vector_embeddings[0].plot_embedding)
+  console.log(vector_embeddings)
 
   const pipeline = [
     {

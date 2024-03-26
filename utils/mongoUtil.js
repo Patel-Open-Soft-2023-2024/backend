@@ -13,7 +13,7 @@ const connectToCluster = async () => {
         console.error('Connection to MongoDB Atlas failed!', error);
         process.exit();
     }
- }
+}
 
 const getDB = () => mongoClient.db("sample_mflix");
 

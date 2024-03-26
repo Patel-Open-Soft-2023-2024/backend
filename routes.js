@@ -18,7 +18,7 @@ router.post("/", async (req, res) => {
 })
 //------------------------------------------------
 
-router.get("/home", getHome);
+router.get("/home",isAuthenticated ,getHome);
 // router.get("/movie/:id", getMovies);
 router.get("/search", autoComplete);
 router.post("/search/semantic", getSemanticSearch);

@@ -117,12 +117,13 @@ const removeMovieFromWatchlist = async (req, res) => {
 
 const login = async (req, res) => {
     console.log(req.body)
-    signInWithEmailAndPassword(auth, req.body.email, req.body.password).then((userCredential) => {
+    await signInWithEmailAndPassword(auth, req.body.email, req.body.password).then((userCredential) => {
         const user = userCredential.user;
         console.log(user);
         res.status(200).json(user);
     }).catch((error) => {
         console.log(error.message);
+        res.status(500).json({ "error": error.message });
     });
 }
 
@@ -146,18 +147,23 @@ const signup = async (req, res) => {
                 Profile_name:req.body.name
             }
             const default_profile=await mongoUtil.getDB().collection("Profile").insertOne(newProfile);
+            // add profile id to headers
+            req.headers.profile_name=default_profile.Profile_name;
+            req.headers.profile_id=default_profile.insertedId;
+            login(req,res);
             // const users_ = await mongoUtil.getDB().collection('User').find({}).toArray();
             // console.log(users_);
             res.status(201).json(result);
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: "Internal server error" });
+            // return res;
         }
         // req.uid = user.uid;
         // createUser(req, res);
     }
     ).catch((error) => {
         console.log(error.message);
+        res.status(500).json({ "error": error.message });
     });
     
 }

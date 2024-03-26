@@ -2,6 +2,7 @@ const { ObjectId } = require("mongodb");
 const mongoUtil = require("../utils/mongoUtil");
 
 const getHome = async (req, res) => {
+
     const movieDB = mongoUtil.getDB().collection("embedded_movies");
     const pipeline = [
       {
