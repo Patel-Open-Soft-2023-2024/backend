@@ -116,6 +116,7 @@ const removeMovieFromWatchlist = async (req, res) => {
 };
 
 const login = async (req, res) => {
+    console.log(req.body)
     signInWithEmailAndPassword(auth, req.body.email, req.body.password).then((userCredential) => {
         const user = userCredential.user;
         console.log(user);
@@ -136,7 +137,6 @@ const signup = async (req, res) => {
                 name: req.body.name,
                 email: req.body.email,
                 watchlist: []
-            
             };
             newUser._id=new ObjectId(newUser._id)
             const result = users.insertOne(newUser);
