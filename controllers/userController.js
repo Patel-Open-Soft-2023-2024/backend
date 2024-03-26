@@ -1,5 +1,5 @@
 const mongoUtil = require('../utils/mongoUtil');
-const { ObjectId } = require('mongodb'); 
+const { ObjectId } = require('mongodb');
 const { auth } = require('../utils/firebaseUtil.js');
 const { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } = require('firebase/auth');
 
@@ -7,7 +7,7 @@ const createUser = async (req, res) => {
     try {
         const users = mongoUtil.getDB().collection("users");
         const newUser = req.body;
-        newUser._id=new ObjectId(newUser._id)
+        newUser._id = new ObjectId(newUser._id)
         const result = await users.insertOne(newUser);
         res.status(201).json(result);
     } catch (error) {
@@ -32,7 +32,7 @@ const getUserById = async (req, res) => {
         const users = mongoUtil.getDB().collection("users");
         const userId = req.params.id;
         // console.log(userId);
-        const result = await users.findOne({ _id: new ObjectId (userId) });
+        const result = await users.findOne({ _id: new ObjectId(userId) });
         // console.log(result);
         if (result) {
             res.status(200).json(result);
@@ -51,7 +51,7 @@ const updateUser = async (req, res) => {
         const updatedUser = req.body;
         updatedUser._id = new ObjectId(updatedUser._id);
         // HERE ADD NEW PARAMETER TO USER/ UPDATE A SINGLE PARAMETER OF USER
-        const result = await users.updateOne({ _id: new ObjectId(updatedUser._id)}, { $set: updatedUser });
+        const result = await users.updateOne({ _id: new ObjectId(updatedUser._id) }, { $set: updatedUser });
         if (result.matchedCount) {
             res.status(200).json({ message: "User updated successfully" });
         } else {
@@ -141,16 +141,17 @@ const signup = async (req, res) => {
             };
             const result = await mongoUtil.getDB().collection('User').insertOne(newUser);
             // const result = await users.insertOne(newUser);
-            const newProfile={
-                _id:new ObjectId(),
-                uid:result.insertedId,
-                Profile_name:req.body.name
+            console.log(result.insertedId);
+            const newProfile = {
+                _id: new ObjectId(),
+                uid: result.insertedId,
+                Profile_name: req.body.name
             }
-            const default_profile=await mongoUtil.getDB().collection("Profile").insertOne(newProfile);
+            const default_profile = await mongoUtil.getDB().collection("Profile").insertOne(newProfile);
             // add profile id to headers
-            req.headers.profile_name=default_profile.Profile_name;
-            req.headers.profile_id=default_profile.insertedId;
-            login(req,res);
+            // req.headers.profile_name = default_profile.Profile_name;
+            // req.headers.profile_id = default_profile.insertedId;
+            login(req, res);
             // const users_ = await mongoUtil.getDB().collection('User').find({}).toArray();
             // console.log(users_);
             res.status(201).json(result);
@@ -165,7 +166,7 @@ const signup = async (req, res) => {
         console.log(error.message);
         res.status(500).json({ "error": error.message });
     });
-    
+
 }
 
 const logout = async (req, res) => {

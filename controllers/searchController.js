@@ -30,15 +30,49 @@ const autoComplete = async (req, res) => {
                                 "path": "title",
                                 "tokenOrder": "sequential",
                             }
+                        },
+                        {
+                            'equals': {
+                                "path": 'cast',
+                                "value": `${req.query.movie}`,
+                                "score": { "boost": { "value": 5 } }
+                            }
+                        },
+                        {
+                            "phrase": {
+                                "query": `${req.query.movie}`,
+                                "path": "cast",
+                                "score": { "boost": { "value": 5 } }
+                            }
+                        },
+                        {
+                            "autocomplete": {
+                                "query": `${req.query.movie}`,
+                                "path": "cast",
+                                "tokenOrder": "sequential",
+                            }
+                        },
+                        {
+                            'equals': {
+                                "path": 'directors',
+                                "value": `${req.query.movie}`,
+                                "score": { "boost": { "value": 5 } }
+                            }
+                        },
+                        {
+                            "phrase": {
+                                "query": `${req.query.movie}`,
+                                "path": "directors",
+                                "score": { "boost": { "value": 5 } }
+                            }
+                        },
+                        {
+                            "autocomplete": {
+                                "query": `${req.query.movie}`,
+                                "path": "directors",
+                                "tokenOrder": "sequential",
+                            }
                         }
-                        // ,
-                        // {
-                        //     "autocomplete": {
-                        //         "query": `${req.query.movie}`,
-                        //         "path": "fullplot",
-                        //         "tokenOrder": "sequential"
-                        //     }
-                        // }
                     ]
                 }
             }
@@ -47,13 +81,9 @@ const autoComplete = async (req, res) => {
             "$project": {
                 "title": 1,
                 "fullplot": 1,
-                "score": { "$meta": "searchScore" },
-                'genres':1,
-                'poster':1,
-                'languages':1,
-                'imdb':1,
-                'year':1,
-                'directors':1
+                "cast": 1,
+                "directors": 1,
+                "score": { "$meta": "searchScore" }
             }
         },
         { "$sort": { "len": -1, "score": -1 } },
