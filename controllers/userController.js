@@ -36,7 +36,7 @@ const createUser = async (req, res) => {
 
 const getUsers = async (req, res) => {
   try {
-    const users = mongoUtil.getDB().collection("users");
+    const users = mongoUtil.getDB().collection("Profile");
     const result = await users.find().toArray();
     res.status(200).json(result);
   } catch (error) {
@@ -286,6 +286,112 @@ const verifyOrder = (req, res) => {
   }
 };
 
+//FOR PROFILE HISTORY
+const addHistoryProfile = async (req, res) => {
+    try {
+        const profile = mongoUtil.getDB().collection("History");
+        const profileId = req.body.profile;
+        const movieId = req.body.movie;
+        const result = await profile.insertOne({ _id:new ObjectId(),Profile_id: profileId, Movie_id: movieId});
+        res.status(200).json({ message: "History added to profile successfully" });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+//Get Profile History
+const getProfileHistory = async (req, res) => {
+    try {
+        const history = mongoUtil.getDB().collection("History");
+        const profileId = req.body.profile;
+        const result = await history.find({ Profile_id: profileId }).toArray();
+        if (result) {
+            //RETURNING THE MOVIE DETAIL FROM MOVIE COLLECTION
+            const movie = mongoUtil.getDB().collection("embedded_movies");
+            // Get all the movie ids from the result and then get the movie details from the movie collection
+            const movieIds = result.map((item) => new ObjectId(item.Movie_id));
+            const movieDetails = await movie.find({ _id: { $in: movieIds } }).toArray();
+            const movieDetailsFiltered = movieDetails.map((movie) => {
+                return {
+                    _id: movie._id,
+                    title: movie.title,
+                    plot: movie.plot,
+                    genres: movie.genres,
+                    poster: movie.poster,
+                    languages: movie.languages,
+                    imdb: movie.imdb,
+                    year: movie.year,
+                    directors: movie.directors
+                };
+            });
+            res.status(200).json(movieDetailsFiltered);
+        } else {
+            res.status(404).json({ error: "User not found" });
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+// ADDING WATCHLIST TO PROFILE
+const addWatchlistToProfile = async (req, res) => {
+    try {
+        const profile = mongoUtil.getDB().collection("Watch_list");
+        const profileId = req.body.profile;
+        const movieId = req.body.movie;
+        const result = await profile.insertOne({ _id:new ObjectId(),Profile_id: profileId, Movie_id: movieId});
+        res.status(200).json({ message: "Watchlist added to profile successfully" });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+// GETTING WATCHLIST OF PROFILE
+const getWatchlistOfProfile = async (req, res) => {
+    try {
+        const profile = mongoUtil.getDB().collection("Watch_list");
+        const profileId = req.body.profile;
+        const result = await profile.find({ Profile_id: profileId }).toArray();
+        if (result) {
+                        const movie = mongoUtil.getDB().collection("embedded_movies");
+            // Get all the movie ids from the result and then get the movie details from the movie collection
+            const movieIds = result.map((item) => new ObjectId(item.Movie_id));
+            const movieDetails = await movie.find({ _id: { $in: movieIds } }).toArray();
+            const movieDetailsFiltered = movieDetails.map((movie) => {
+                return {
+                    _id: movie._id,
+                    title: movie.title,
+                    plot: movie.plot,
+                    genres: movie.genres,
+                    poster: movie.poster,
+                    languages: movie.languages,
+                    imdb: movie.imdb,
+                    year: movie.year,
+                    directors: movie.directors
+                };
+            });
+            res.status(200).json(movieDetailsFiltered);
+        } else {
+            res.status(404).json({ error: "Profile not found" });
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+/*
+  {
+    "_id": "6603437b952f9a35d3c999d7",
+    "uid": "6603437b952f9a35d3c999d6",
+    "Profile_name": "Dev"
+  },
+
+*/
+
 module.exports = {
   createUser,
   getUsers,
@@ -300,4 +406,8 @@ module.exports = {
   googleLogin,
   createOrder,
   verifyOrder,
+  addHistoryProfile,
+  getProfileHistory,
+  addWatchlistToProfile,
+  getWatchlistOfProfile
 };

@@ -11,7 +11,7 @@ const getHome = async (req, res) => {
         }
       }, {
         '$project': {
-          '_id': 0,
+          '_id': 1,
           'title': 1,
           'plot': 1,
           'genres':1,
