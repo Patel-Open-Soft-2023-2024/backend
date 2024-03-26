@@ -127,19 +127,27 @@ const login = async (req, res) => {
 }
 
 const signup = async (req, res) => {
-    createUserWithEmailAndPassword(auth, req.body.email, req.body.password).then((userCredential) => {
+    createUserWithEmailAndPassword(auth, req.body.email, req.body.password).then(async (userCredential) => {
         const user = userCredential.user;
         console.log(user);
         try {
-            const users = mongoUtil.getDB().collection("users");
             const newUser = {
+                _id: new ObjectId(),
                 uid: user.uid,
-                name: req.body.name,
-                email: req.body.email,
-                watchlist: []
+                Name: req.body.name,
+                Email: req.body.email,
+                Subscription: 'None',
             };
-            newUser._id=new ObjectId(newUser._id)
-            const result = users.insertOne(newUser);
+            const result = await mongoUtil.getDB().collection('User').insertOne(newUser);
+            // const result = await users.insertOne(newUser);
+            const newProfile={
+                _id:new ObjectId(),
+                uid:result.insertedId,
+                Profile_name:req.body.name
+            }
+            const default_profile=await mongoUtil.getDB().collection("Profile").insertOne(newProfile);
+            // const users_ = await mongoUtil.getDB().collection('User').find({}).toArray();
+            // console.log(users_);
             res.status(201).json(result);
         } catch (error) {
             console.log(error);
