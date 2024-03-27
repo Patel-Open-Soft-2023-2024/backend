@@ -419,6 +419,8 @@ const getSimilarMovies = async (movie_id) => {
   return result;
 }
 
+//GET 
+
 /*
   {
     "_id": "6603437b952f9a35d3c999d7",
@@ -446,6 +448,57 @@ const getHomeData = async (req, res) => {
   }
 };
 
+function hexToDecimalUsingMap(hexString) {
+    const hexCharacters = '0123456789ABCDEF';
+    let decimal = 0;
+    hexString.toUpperCase().split('').forEach((char, index) => {
+        const value = hexCharacters.indexOf(char);
+        if (value === -1) {
+            throw new Error('Invalid hexadecimal character found');
+        }
+        decimal += value;
+        decimal=decimal%3;
+    });
+  
+    return decimal;
+}
+
+const getMovieVideoById = async (req, res) => {
+  movie_video_urls_list = {
+  "1": {
+    "previewLink": "https://dge8ab9n7stt8.cloudfront.net/Oppenheimer/Oppenheimer_preview.mp4",
+    "premiumLink": "https://dge8ab9n7stt8.cloudfront.net/Oppenheimer/Oppenheimer _1080p.m3u8",
+    "standardLink": "https://dge8ab9n7stt8.cloudfront.net/Oppenheimer/Oppenheimer _720p.m3u8",
+    "basicLink": "https://dge8ab9n7stt8.cloudfront.net/Oppenheimer/Oppenheimer _540p.m3u8"
+  },
+  "2": {
+    "previewLink": "https://dge8ab9n7stt8.cloudfront.net/BigBuckBunny/BigBuckBunny_preview.mp4",
+    "premiumLink": "https://dge8ab9n7stt8.cloudfront.net/BigBuckBunny/BigBuckBunny1080p.m3u8",
+    "standardLink": "https://dge8ab9n7stt8.cloudfront.net/BigBuckBunny/BigBuckBunny720p.m3u8",
+    "basicLink": "https://dge8ab9n7stt8.cloudfront.net/BigBuckBunny/BigBuckBunny540p.m3u8"
+  },
+  "3": {
+    "previewLink": "https://dge8ab9n7stt8.cloudfront.net/Video/preview_Road_House.mp4",
+    "premiumLink": "https://dge8ab9n7stt8.cloudfront.net/Video/sample_1080p.m3u8",
+    "standardLink": "https://dge8ab9n7stt8.cloudfront.net/Video/sample_720p.m3u8",
+    "basicLink": "https://dge8ab9n7stt8.cloudfront.net/Video/sample_540p.m3u8"
+  }
+}
+  try {
+    var movie_id = req.body.movie_id;
+    const sub = req.body.video_type;
+    movie_id=hexToDecimalUsingMap(movie_id);
+    const movie = movie_video_urls_list[movie_id][sub];
+    res.status(200).json({ movie: movie });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+
+//EXPORTING ALL FUNCTIONS
 module.exports = {
   createUser,
   getUsers,
@@ -463,4 +516,5 @@ module.exports = {
   addHistoryProfile,
   getHomeData,
   addWatchlistToProfile,
+  getMovieVideoById
 };
