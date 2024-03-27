@@ -301,10 +301,9 @@ const addHistoryProfile = async (req, res) => {
 };
 
 //Get Profile History
-const getProfileHistory = async (req, res) => {
+const getProfileHistory = async (profileId) => {
     try {
         const history = mongoUtil.getDB().collection("History");
-        const profileId = req.body.profile;
         const result = await history.find({ Profile_id: profileId }).toArray();
         if (result) {
             //RETURNING THE MOVIE DETAIL FROM MOVIE COLLECTION
@@ -325,9 +324,9 @@ const getProfileHistory = async (req, res) => {
                     directors: movie.directors
                 };
             });
-            res.status(200).json(movieDetailsFiltered);
+            return movieDetailsFiltered;
         } else {
-            res.status(404).json({ error: "User not found" });
+          return None;
         }
     } catch (error) {
         console.log(error);
@@ -350,10 +349,9 @@ const addWatchlistToProfile = async (req, res) => {
 };
 
 // GETTING WATCHLIST OF PROFILE
-const getWatchlistOfProfile = async (req, res) => {
+const getWatchlistOfProfile = async (profileId) => {
     try {
         const profile = mongoUtil.getDB().collection("Watch_list");
-        const profileId = req.body.profile;
         const result = await profile.find({ Profile_id: profileId }).toArray();
         if (result) {
                         const movie = mongoUtil.getDB().collection("embedded_movies");
@@ -373,9 +371,9 @@ const getWatchlistOfProfile = async (req, res) => {
                     directors: movie.directors
                 };
             });
-            res.status(200).json(movieDetailsFiltered);
+            return movieDetailsFiltered;
         } else {
-            res.status(404).json({ error: "Profile not found" });
+          return None;
         }
     } catch (error) {
         console.log(error);
@@ -391,6 +389,18 @@ const getWatchlistOfProfile = async (req, res) => {
   },
 
 */
+//Getting all home page data
+const getHomeData = async (req, res) => {
+  try {
+    const profile = req.body.profile_id;
+    const result = await getWatchlistOfProfile(profile);
+    const result2= await getProfileHistory(profile);
+    res.status(200).json({watchlist: result, history: result2});
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
 
 module.exports = {
   createUser,
@@ -407,7 +417,6 @@ module.exports = {
   createOrder,
   verifyOrder,
   addHistoryProfile,
-  getProfileHistory,
+  getHomeData,
   addWatchlistToProfile,
-  getWatchlistOfProfile
 };

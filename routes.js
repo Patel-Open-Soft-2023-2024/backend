@@ -2,7 +2,7 @@ const express = require('express');
 const { getSimilarMovies} = require('./controllers/moviesController');
 const { autoComplete, getSemanticSearch } = require('./controllers/searchController');
 const { isAuthenticated } = require('./middleware/isAuthenticated');
-const { getUsers, getUserById, updateUser, createUser, deleteUser, addMovieToWatchlist, removeMovieFromWatchlist, login, googleLogin, logout, signup, createOrder, verifyOrder,addHistoryProfile,getProfileHistory,addWatchlistToProfile,getWatchlistOfProfile } = require('./controllers/userController');
+const { getUsers, getUserById, updateUser, createUser, deleteUser, addMovieToWatchlist, removeMovieFromWatchlist, login, googleLogin, logout, signup, createOrder, verifyOrder,addHistoryProfile,getHomeData,addWatchlistToProfile } = require('./controllers/userController');
 const { publishMessage } = require('./controllers/redisController');
 const { getHome } = require('./controllers/homeController');
 
@@ -37,9 +37,8 @@ router.post("/login", login);
 router.post("/signup", signup);
 router.get("/logout", logout);
 router.get("/googlelogin", googleLogin);
-router.get("/getprofilehistory", getProfileHistory);
 router.post("/addwatchlist", addWatchlistToProfile);
-router.get("/getwatchlist", getWatchlistOfProfile);
+router.get("/homedata", getHomeData);
 router.post("/addhistory", addHistoryProfile);
 // PAYMENT ROUTES
 router.post("/payment/createOrder", createOrder);
