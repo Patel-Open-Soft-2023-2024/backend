@@ -381,6 +381,44 @@ const getWatchlistOfProfile = async (profileId) => {
     }
 };
 
+const getSimilarMovies = async (movie_id) => {
+  const _id=movie_id;
+  const movieDB = mongoUtil.getDB().collection("embedded_movies");
+  const vector_embeddings = await movieDB.find({ _id }).project({ "plot_embedding": 1, "_id": 0 }).toArray();
+  // console.log(vector_embeddings)
+
+  const pipeline = [
+    {
+      '$vectorSearch': {
+        'index': 'vector_inde',
+        'path': 'plot_embedding',
+        'queryVector': vector_embeddings[0].plot_embedding,
+        'numCandidates': 150,
+        'limit': 10
+      }
+    }, {
+      '$project': {
+        '_id': 0,
+        'plot': 1,
+        'title': 1,
+        'score': {
+          '$meta': 'vectorSearchScore',
+        },
+          'genres':1,
+            'poster':1,
+            'languages':1,
+            'imdb':1,
+            'year':1,
+            'directors':1
+        
+      }
+    }
+  ];
+
+  const result = await movieDB.aggregate(pipeline).toArray();
+  return result;
+}
+
 /*
   {
     "_id": "6603437b952f9a35d3c999d7",
@@ -394,8 +432,14 @@ const getHomeData = async (req, res) => {
   try {
     const profile = req.body.profile_id;
     const result = await getWatchlistOfProfile(profile);
-    const result2= await getProfileHistory(profile);
-    res.status(200).json({watchlist: result, history: result2});
+    const result2 = await getProfileHistory(profile);
+    //GET _id of first movie of history
+    const movie_id = result2[0]._id;
+    const movie_name = result2[0].title;
+    //Get similar movies
+    const similar_movies = await getSimilarMovies(movie_id);
+    //ADD MOVIE_NAME AS KEY TO SIMILAR MOVIES
+    res.status(200).json({ watchlist: result, history: result2, similar_movie: { [movie_name]:similar_movies } });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal server error" });
