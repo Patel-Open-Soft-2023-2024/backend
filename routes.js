@@ -22,7 +22,7 @@ router.get("/home" ,getHome);
 // router.get("/movie/:id", getMovies);
 router.get("/search", autoComplete);
 router.post("/search/semantic", getSemanticSearch);
-// router.get("/movie/similar/:id", getSimilarMovies);
+router.get("/movie/similar/:id", getSimilarMovies);
 
 // USER ROUTES
 router.get("/getalluser", getUsers);

@@ -1,99 +1,277 @@
-require("dotenv").config({path: "../config.env"});
+require("dotenv").config({ path: "../config.env" });
 const mongoUtil = require('../utils/mongoUtil')
 
 const autoComplete = async (req, res) => {
     console.log(req.query.movie);
     const movies = mongoUtil.getDB().collection("movies");
-    const pipeline = [
-        {
-            "$search": {
-                "index": "default",
-                "compound": {
-                    "should": [
-                        {
-                            'equals': {
-                                "path": 'title',
-                                "value": `${req.query.movie}`,
-                                "score": { "boost": { "value": 5 } }
+    if (req.query.autocomplete) {
+        const autoCompletePipeline = [
+            {
+                "$search": {
+                    "index": "default",
+                    "compound": {
+                        "should": [
+                            {
+                                'equals': {
+                                    "path": 'title',
+                                    "value": `${req.query.movie}`,
+                                    "score": { "boost": { "value": 5 } }
+                                }
+                            },
+                            {
+                                "text": {
+                                    "query": `${req.query.movie}`,
+                                    "path": "title",
+                                    "fuzzy": {
+                                        "maxEdits": 2
+                                    },
+                                }
+                            },
+                            {
+                                "autocomplete": {
+                                    "query": `${req.query.movie}`,
+                                    "path": "title",
+                                    "tokenOrder": "sequential",
+                                }
                             }
-                        },
-                        {
-                            "phrase": {
-                                "query": `${req.query.movie}`,
-                                "path": "title",
-                                "score": { "boost": { "value": 5 } }
-                            }
-                        },
-                        {
-                            "autocomplete": {
-                                "query": `${req.query.movie}`,
-                                "path": "title",
-                                "tokenOrder": "sequential",
-                            }
-                        },
-                        {
-                            'equals': {
-                                "path": 'cast',
-                                "value": `${req.query.movie}`,
-                                "score": { "boost": { "value": 5 } }
-                            }
-                        },
-                        {
-                            "phrase": {
-                                "query": `${req.query.movie}`,
-                                "path": "cast",
-                                "score": { "boost": { "value": 5 } }
-                            }
-                        },
-                        {
-                            "autocomplete": {
-                                "query": `${req.query.movie}`,
-                                "path": "cast",
-                                "tokenOrder": "sequential",
-                            }
-                        },
-                        {
-                            'equals': {
-                                "path": 'directors',
-                                "value": `${req.query.movie}`,
-                                "score": { "boost": { "value": 5 } }
-                            }
-                        },
-                        {
-                            "phrase": {
-                                "query": `${req.query.movie}`,
-                                "path": "directors",
-                                "score": { "boost": { "value": 5 } }
-                            }
-                        },
-                        {
-                            "autocomplete": {
-                                "query": `${req.query.movie}`,
-                                "path": "directors",
-                                "tokenOrder": "sequential",
-                            }
-                        }
-                    ]
+                        ]
+                    }
                 }
-            }
-        },
-        {
-            "$project": {
-                "title": 1,
-                "fullplot": 1,
-                "cast": 1,
-                "directors": 1,
-                "score": { "$meta": "searchScore" }
-            }
-        },
-        { "$sort": { "len": -1, "score": -1 } },
-        {
-            "$limit": 20
-        },
-    ]
+            },
+            {
+                "$project": {
+                    '_id': 1,
+                    // 'fullplot': 1,
+                    'title': 1,
+                    'score': {
+                        '$meta': 'searchScore'
+                    },
+                    // 'genres': 1,
+                    // 'poster': 1,
+                    // 'languages': 1,
+                    // 'imdb': 1,
+                    // 'year': 1,
+                    // 'directors': 1
+                }
+            },
+            { "$sort": { "len": -1, "score": -1 } },
+            {
+                "$limit": 20
+            },
+        ]
+        try {
+            const data = await movies.aggregate(autoCompletePipeline).toArray();
+            res.status(200).json({ data: data });
+        }
+        catch (error) {
+            console.log(error);
+            res.status(500).json({ "error": "Internal server error" });
+        }
+    }
+    else {
+        const titlePipeline = [
+            {
+                "$search": {
+                    "index": "default",
+                    "compound": {
+                        "should": [
+                            {
+                                'equals': {
+                                    "path": 'title',
+                                    "value": `${req.query.movie}`,
+                                    "score": { "boost": { "value": 5 } }
+                                }
+                            },
+                            {
+                                "text": {
+                                    "query": `${req.query.movie}`,
+                                    "path": "title",
+                                    "fuzzy": {
+                                        "maxEdits": 2
+                                    },
+                                }
+                            },
+                            {
+                                "autocomplete": {
+                                    "query": `${req.query.movie}`,
+                                    "path": "title",
+                                    "tokenOrder": "sequential",
+                                }
+                            },
+                            {
+                                "text": {
+                                    "query": `${req.query.movie}`,
+                                    "path": "title",
+                                    "fuzzy":
+                                    {
+                                        "maxEdits": 2
+                                    },
+                                }
+                            },
+                        ]
+                    }
+                }
+            },
+            {
+                "$project": {
+                    '_id': 1,
+                    'title': 1,
+                    'poster': 1,
+                    'languages': 1,
+                    'imdb': 1,
+                    'year': 1,
+                    // "score": { "$meta": "searchScore" }
+                }
+            },
+            { "$sort": { "len": -1, "score": -1 } },
+            {
+                "$limit": 20
+            },
+        ];
+        const castPipeline = [
+            {
+                "$search": {
+                    "index": "default",
+                    "compound": {
+                        "should": [
+                            {
+                                'equals': {
+                                    "path": 'cast',
+                                    "value": `${req.query.movie}`,
+                                    "score": { "boost": { "value": 5 } }
+                                }
+                            },
+                            {
+                                "phrase": {
+                                    "query": `${req.query.movie}`,
+                                    "path": "cast",
+                                    "score": { "boost": { "value": 5 } }
+                                }
+                            },
+                            {
+                                "autocomplete": {
+                                    "query": `${req.query.movie}`,
+                                    "path": "cast",
+                                    "tokenOrder": "sequential",
+                                }
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "$project": {
+                    '_id': 1,
+                    'title': 1,
+                    'poster': 1,
+                    'languages': 1,
+                    'imdb': 1,
+                    'year': 1,
+                }
+            },
+            { "$sort": { "len": -1, "score": -1 } },
+            {
+                "$limit": 20
+            },
+        ];
+        const directorPipeline = [
+            {
+                "$search": {
+                    "index": "default",
+                    "compound": {
+                        "should": [
+                            {
+                                'equals': {
+                                    "path": "directors",
+                                    "value": `${req.query.movie}`,
+                                    "score": { "boost": { "value": 5 } }
+                                }
+                            },
+                            {
+                                "phrase": {
+                                    "query": `${req.query.movie}`,
+                                    "path": "directors",
+                                    "score": { "boost": { "value": 5 } }
+                                }
+                            },
+                            {
+                                "autocomplete": {
+                                    "query": `${req.query.movie}`,
+                                    "path": "directors",
+                                    "tokenOrder": "sequential",
+                                }
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "$project": {
+                    '_id': 1,
+                    'title': 1,
+                    'poster': 1,
+                    'languages': 1,
+                    'imdb': 1,
+                    'year': 1,
+                }
+            },
+            { "$sort": { "len": -1, "score": -1 } },
+            {
+                "$limit": 20
+            },
+        ];
+        const genresPipeline = [
+            {
+                "$search": {
+                    "index": "default",
+                    "compound": {
+                        "should": [
+                            {
+                                'equals': {
+                                    "path": "genres",
+                                    "value": `${req.query.movie}`,
+                                    "score": { "boost": { "value": 5 } }
+                                }
+                            },
+                            {
+                                "phrase": {
+                                    "query": `${req.query.movie}`,
+                                    "path": "genres",
+                                    "score": { "boost": { "value": 5 } }
+                                }
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "$project": {
+                    '_id': 1,
+                    'title': 1,
+                    'poster': 1,
+                    'languages': 1,
+                    'imdb': 1,
+                    'year': 1,
+                }
+            },
+            { "$sort": { "len": -1, "score": -1 } },
+            {
+                "$limit": 20
+            },
+        ]
 
-    const data = await movies.aggregate(pipeline).toArray();
-    res.status(200).json({ data: data });
+        try {
+            const title = await movies.aggregate(titlePipeline).toArray();
+            const directors = await movies.aggregate(directorPipeline).toArray();
+            const cast = await movies.aggregate(castPipeline).toArray();
+            const genres = await movies.aggregate(genresPipeline).toArray();
+            res.status(200).json({ "title": title, "cast": cast, "directors": directors, "genres": genres })
+        }
+        catch (error) {
+            console.log(error);
+            res.status(500).json({ "error": "Internal server error" })
+        }
+    }
 }
 
 const getSemanticSearch = async (req, res) => {
@@ -102,7 +280,6 @@ const getSemanticSearch = async (req, res) => {
         "input": req.body.query,
         "model": "text-embedding-ada-002",
     }
-    console.log(body);
     try {
         await fetch("https://api.openai.com/v1/embeddings", {
             method: "POST",
@@ -129,32 +306,23 @@ const getSemanticSearch = async (req, res) => {
                 }, {
                     '$project': {
                         '_id': 1,
-                        'fullplot': 1,
                         'title': 1,
-                        'score': {
-                            '$meta': 'vectorSearchScore'
-                        },
-                        'genres':1,
-                        'poster':1,
-                        'languages':1,
-                        'imdb':1,
-                        'year':1,
-                        'directors':1
+                        'poster': 1,
+                        'languages': 1,
+                        'imdb': 1,
+                        'year': 1,
                     }
                 }
             ];
 
             const result = await movieDB.aggregate(pipeline).toArray();
-            // console.log(result);
             res.json(result);
         }).catch((error) => {
             console.log(error);
-            res.status(400).json(error);
         })
     }
     catch (error) {
         console.log(error);
-        res.status(400).json({error: error, "message": "Unable to process the request now."});
     }
 }
 
