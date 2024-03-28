@@ -4,7 +4,7 @@ const { autoComplete, getSemanticSearch } = require('./controllers/searchControl
 const { isAuthenticated } = require('./middleware/isAuthenticated');
 const { getUsers, getUserById, updateUser, createUser, deleteUser, addMovieToWatchlist, removeMovieFromWatchlist, login, googleLogin, logout, signup, createOrder, verifyOrder,addHistoryProfile,getHomeData,addWatchlistToProfile, getMovieVideoById } = require('./controllers/userController');
 const { publishMessage } = require('./controllers/redisController');
-const { getHome,getRandom } = require('./controllers/homeController');
+const { getHome,getRandom, getSection } = require('./controllers/homeController');
 const { signupWithEmailAndPassword, signinWithEmailAndPassword } = require('./controllers/firebaseAuthController');
 
 const router = express.Router();
@@ -21,10 +21,12 @@ router.post("/", async (req, res) => {
 
 router.get("/home" ,getHome);
 router.get("/random" ,getRandom);
+router.get("/section/:name", getSection);
 router.get("/movie/:id", getMovies);
 router.get("/search", autoComplete);
 router.post("/search/semantic", getSemanticSearch);
 router.get("/movie/similar/:id", getSimilarMovies);
+// router.post("/moresearch", getMoreResults);
 
 // USER ROUTES
 router.get("/getalluser", getUsers);

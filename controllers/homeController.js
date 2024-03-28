@@ -7,7 +7,7 @@ async function getMovieSection(section) {
     const pipeline = [
       {
         '$sample': {
-          'size': 5
+          'size': 8
         }
       }, {
         '$project': {
@@ -28,16 +28,15 @@ async function getMovieSection(section) {
     return result;
 }
 
+const getSection = async (req, res) => {
+  const section = req.params.name;
+  const movies = await getMovieSection(section);
+  res.status(200).json(movies);
+}
+
 const getHome = async (req, res) => {
   const sections = ["Trending", "Top Rated", "Action", "Romance", "Comedy"];
-  var moviesJson = {};
-  Promise.all(
-    sections.map(async (section) => {
-      moviesJson[section] = await getMovieSection(section);
-    })
-  ).then(() => {
-    res.status(200).json(moviesJson);
-  });
+  res.status(200).json(sections);
 }
 
 
@@ -69,4 +68,4 @@ const getRandom = async (req, res) => {
   res.status(200).json(result);
 }
 
-module.exports = { getHome,getRandom }
+module.exports = { getHome,getRandom, getSection }

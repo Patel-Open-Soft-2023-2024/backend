@@ -261,11 +261,15 @@ const autoComplete = async (req, res) => {
         ]
 
         try {
-            const title = await movies.aggregate(titlePipeline).toArray();
-            const directors = await movies.aggregate(directorPipeline).toArray();
-            const cast = await movies.aggregate(castPipeline).toArray();
-            const genres = await movies.aggregate(genresPipeline).toArray();
-            res.status(200).json({ "title": title, "cast": cast, "directors": directors, "genres": genres })
+            Promise.all([movies.aggregate(titlePipeline).toArray(), movies.aggregate(directorPipeline).toArray(), movies.aggregate(castPipeline).toArray(), movies.aggregate(genresPipeline).toArray()]).then((result) => { 
+                
+                res.status(200).json({ "title": result[0], "cast": result[2], "directors": result[1], "genres": result[3] })
+            })
+            // const title = await movies.aggregate(titlePipeline).toArray();
+            // const directors = await movies.aggregate(directorPipeline).toArray();
+            // const cast = await movies.aggregate(castPipeline).toArray();
+            // const genres = await movies.aggregate(genresPipeline).toArray();
+            // res.status(200).json({ "title": title, "cast": cast, "directors": directors, "genres": genres })
         }
         catch (error) {
             console.log(error);
@@ -273,6 +277,12 @@ const autoComplete = async (req, res) => {
         }
     }
 }
+
+// const getMoreResults = async (req, res) => {
+//     console.log(req.body);
+//     const movies = mongoUtil.getDB().collection("movies");
+
+// }
 
 const getSemanticSearch = async (req, res) => {
     const movieDB = mongoUtil.getDB().collection("embedded_movies");

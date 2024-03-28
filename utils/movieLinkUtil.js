@@ -59,7 +59,9 @@ function insertPreviewLink(movieList) {
         const objectId = movie._id;
         const decimalRepresentation = BigInt('0x' + objectId);
         const hashValue = Number((decimalRepresentation % BigInt(rangeMax)));
+
         movie.previewLink = movieLinksList[hashValue].getPreviewLink();
+        movie.alternatePoster = 'https://fontmeme.com/images/oppenheimer-font.jpg'
     });
 
 }
