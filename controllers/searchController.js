@@ -31,7 +31,7 @@ const autoComplete = async (req, res) => {
                                 "autocomplete": {
                                     "query": `${req.query.movie}`,
                                     "path": "title",
-                                    "tokenOrder": "sequential",
+                                    "tokenOrder": "sequential"
                                 }
                             }
                         ]
@@ -41,13 +41,13 @@ const autoComplete = async (req, res) => {
             {
                 "$project": {
                     '_id': 1,
-                    // 'fullplot': 1,
+                    'plot': 1,
                     'title': 1,
                     'score': {
                         '$meta': 'searchScore'
                     },
                     // 'genres': 1,
-                    // 'poster': 1,
+                    'poster': 1,
                     // 'languages': 1,
                     // 'imdb': 1,
                     // 'year': 1,

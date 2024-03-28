@@ -432,7 +432,7 @@ const getSimilarMovies = async (movie_id) => {
 //Getting all home page data
 const getHomeData = async (req, res) => {
   try {
-    const profile = req.body.profile_id;
+    const profile = "6603437b952f9a35d3c999d7";
     const result = await getWatchlistOfProfile(profile);
     const result2 = await getProfileHistory(profile);
     //GET _id of first movie of history

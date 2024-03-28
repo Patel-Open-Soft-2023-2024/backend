@@ -44,14 +44,15 @@ const getSimilarMovies = async (req, res) => {
         'plot': 1,
         'title': 1,
         'score': {
-          '$meta': 'vectorSearchScore',
+          '$meta': 'vectorSearchScore'
+        },
           'genres':1,
             'poster':1,
             'languages':1,
             'imdb':1,
             'year':1,
             'directors':1
-        }
+        
       }
     }
   ];
