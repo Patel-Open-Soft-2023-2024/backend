@@ -5,6 +5,7 @@ const { isAuthenticated } = require('./middleware/isAuthenticated');
 const { getUsers, getUserById, updateUser, createUser, deleteUser, addMovieToWatchlist, removeMovieFromWatchlist, login, googleLogin, logout, signup, createOrder, verifyOrder,addHistoryProfile,getHomeData,addWatchlistToProfile, getMovieVideoById } = require('./controllers/userController');
 const { publishMessage } = require('./controllers/redisController');
 const { getHome,getRandom } = require('./controllers/homeController');
+const { signupWithEmailAndPassword, signinWithEmailAndPassword } = require('./controllers/firebaseAuthController');
 
 const router = express.Router();
 
@@ -36,8 +37,11 @@ router.post("/removemovie:id", removeMovieFromWatchlist);
 router.get("/favourites",/* my list of users*/);
 
 // router.post("/publish", publishMessage);
-router.post("/login", login);
-router.post("/signup", signup);
+// router.post("/login", login);
+// router.post("/signup", signup);
+router.post("/signup", signupWithEmailAndPassword);
+router.post("/signin", signinWithEmailAndPassword);
+
 router.get("/logout", logout);
 router.get("/googlelogin", googleLogin);
 router.post("/addwatchlist", addWatchlistToProfile);
