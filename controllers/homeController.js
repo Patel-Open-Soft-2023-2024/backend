@@ -1,6 +1,6 @@
 const { ObjectId } = require("mongodb");
 const mongoUtil = require("../utils/mongoUtil");
-const insertPreviewLink = require("../utils/movieLinkUtil");
+const {insertPreviewLink} = require("../utils/movieLinkUtil");
 
 const getHome = async (req, res) => {
 
@@ -25,7 +25,6 @@ const getHome = async (req, res) => {
       }
     ];
     const result = await movieDB.aggregate(pipeline).toArray();
-    console.log("*************************************************\n\n\n", result);
     insertPreviewLink(result);
     res.status(200).json(result);
 }
