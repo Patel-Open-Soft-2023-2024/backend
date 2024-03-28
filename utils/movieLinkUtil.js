@@ -2,8 +2,7 @@
 const cloudFrontUrl = 'https://dge8ab9n7stt8.cloudfront.net/'
 
 class MovieLinks {
-    constructor(id, previewFile, premiumFile, standardFile, basicFile) {
-        this.id = id;
+    constructor(previewFile, premiumFile, standardFile, basicFile) {
         this.previewLink = cloudFrontUrl + previewFile;
         this.premiumLink = cloudFrontUrl + premiumFile;
         this.standardLink = cloudFrontUrl + standardFile
@@ -21,12 +20,14 @@ class MovieLinks {
                 return this.previewLink;
         }
     }
+    getPreviewLink() {
+        return this.previewLink;
+    }
 }
 
 
 // Creating instances of MovieLinks for each movie
 const oppenheimer = new MovieLinks(
-    1,
     "Oppenheimer/Oppenheimer_preview.mp4",
     "Oppenheimer/Oppenheimer_1080p.m3u8",
     "Oppenheimer/Oppenheimer_720p.m3u8",
@@ -34,7 +35,6 @@ const oppenheimer = new MovieLinks(
 );
 
 const bigBuckBunny = new MovieLinks(
-    2,
     "BigBuckBunny/BigBuckBunny_preview.mp4",
     "BigBuckBunny/BigBuckBunny1080p.m3u8",
     "BigBuckBunny/BigBuckBunny720p.m3u8",
@@ -42,7 +42,6 @@ const bigBuckBunny = new MovieLinks(
 );
 
 const roadHouse = new MovieLinks(
-    3,
     "Video/preview_Road_House.mp4",
     "Video/sample_1080p.m3u8",
     "Video/sample_720p.m3u8",
@@ -59,8 +58,9 @@ function insertPreviewLink(movieList) {
     movieList.forEach(movie => {
         const objectId = movie._id;
         const decimalRepresentation = BigInt('0x' + objectId);
-        const hashValue = (decimalRepresentation % BigInt(rangeMax)) + BigInt(1);
-        movie.previewLink = movieLinksList[hashValue].previewLink;
+        const hashValue = Number((decimalRepresentation % BigInt(rangeMax)));
+        console.log("hashValue", hashValue, "movieLinksList[hashValue]", movieLinksList[hashValue]);
+        movie.previewLink = movieLinksList[hashValue].getPreviewLink();
     });
 
 }
