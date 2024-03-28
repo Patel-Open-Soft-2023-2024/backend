@@ -4,6 +4,9 @@ const {insertPreviewLink} = require('../utils/movieLinkUtil');
 
 const autoComplete = async (req, res) => {
     console.log(req.query.movie);
+    const query_name = req.query.movie;
+    // remove spaces from the string
+    const query_no_space = query_name.replace(/\s+/g, '');
     const movies = mongoUtil.getDB().collection("movies");
     if (req.query.autocomplete) {
         const autoCompletePipeline = [
@@ -15,13 +18,13 @@ const autoComplete = async (req, res) => {
                             {
                                 'equals': {
                                     "path": 'title',
-                                    "value": `${req.query.movie}`,
+                                    "value": `${query_no_space}`,
                                     "score": { "boost": { "value": 5 } }
                                 }
                             },
                             {
                                 "text": {
-                                    "query": `${req.query.movie}`,
+                                    "query": `${query_name}`,
                                     "path": "title",
                                     "fuzzy": {
                                         "maxEdits": 2
@@ -30,7 +33,7 @@ const autoComplete = async (req, res) => {
                             },
                             {
                                 "autocomplete": {
-                                    "query": `${req.query.movie}`,
+                                    "query": `${query_name}`,
                                     "path": "title",
                                     "tokenOrder": "sequential"
                                 }
@@ -83,13 +86,13 @@ const autoComplete = async (req, res) => {
                             {
                                 'equals': {
                                     "path": 'title',
-                                    "value": `${req.query.movie}`,
+                                    "value": `${query_no_space}`,
                                     "score": { "boost": { "value": 5 } }
                                 }
                             },
                             {
                                 "text": {
-                                    "query": `${req.query.movie}`,
+                                    "query": `${query_name}`,
                                     "path": "title",
                                     "fuzzy": {
                                         "maxEdits": 2
@@ -98,14 +101,14 @@ const autoComplete = async (req, res) => {
                             },
                             {
                                 "autocomplete": {
-                                    "query": `${req.query.movie}`,
+                                    "query": `${query_name}`,
                                     "path": "title",
                                     "tokenOrder": "sequential",
                                 }
                             },
                             {
                                 "text": {
-                                    "query": `${req.query.movie}`,
+                                    "query": `${query_name}`,
                                     "path": "title",
                                     "fuzzy":
                                     {
@@ -149,20 +152,20 @@ const autoComplete = async (req, res) => {
                             {
                                 'equals': {
                                     "path": 'cast',
-                                    "value": `${req.query.movie}`,
+                                    "value": `${query_no_space}`,
                                     "score": { "boost": { "value": 5 } }
                                 }
                             },
                             {
                                 "phrase": {
-                                    "query": `${req.query.movie}`,
+                                    "query": `${query_name}`,
                                     "path": "cast",
                                     "score": { "boost": { "value": 5 } }
                                 }
                             },
                             {
                                 "autocomplete": {
-                                    "query": `${req.query.movie}`,
+                                    "query": `${query_name}`,
                                     "path": "cast",
                                     "tokenOrder": "sequential",
                                 }
@@ -202,20 +205,20 @@ const autoComplete = async (req, res) => {
                             {
                                 'equals': {
                                     "path": "directors",
-                                    "value": `${req.query.movie}`,
+                                    "value": `${query_no_space}`,
                                     "score": { "boost": { "value": 5 } }
                                 }
                             },
                             {
                                 "phrase": {
-                                    "query": `${req.query.movie}`,
+                                    "query": `${query_name}`,
                                     "path": "directors",
                                     "score": { "boost": { "value": 5 } }
                                 }
                             },
                             {
                                 "autocomplete": {
-                                    "query": `${req.query.movie}`,
+                                    "query": `${query_name}`,
                                     "path": "directors",
                                     "tokenOrder": "sequential",
                                 }
@@ -254,13 +257,13 @@ const autoComplete = async (req, res) => {
                             {
                                 'equals': {
                                     "path": "genres",
-                                    "value": `${req.query.movie}`,
+                                    "value": `${query_no_space}`,
                                     "score": { "boost": { "value": 5 } }
                                 }
                             },
                             {
                                 "phrase": {
-                                    "query": `${req.query.movie}`,
+                                    "query": `${query_name}`,
                                     "path": "genres",
                                     "score": { "boost": { "value": 5 } }
                                 }
