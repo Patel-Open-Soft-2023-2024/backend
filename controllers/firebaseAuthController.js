@@ -17,7 +17,12 @@ const signupWithEmailAndPassword = async (req, res) => {
         }).then((response) => {
             return response.json();
         }).then((response) => {
-            res.status(200).json({"status": "success", "message": "User created successfully.", "token": response.idToken});
+            if(response.error) {
+                res.status(response.error.code).json({"status": "failure", "message": response.error.message});
+            }
+            else {
+                res.status(200).json({"status": "success", "message": "User logged in successfully.", "token": response.idToken});
+            }
         })
     }
     catch (error) {
@@ -43,9 +48,14 @@ const signinWithEmailAndPassword = async (req, res) => {
         }).then((resp) => {
             return resp.json();
         }).then((response) => {
-            res.status(200).json({"status": "success", "message": "User created successfully.", "token": response.idToken});
-        })
-    }
+            console.log(response);
+            if(response.error) {
+            res.status(response.error.code).json({"status": "failure", "message": response.error.message});
+        }
+        else {
+            res.status(200).json({"status": "success", "message": "User logged in successfully.", "token": response.idToken});
+        }
+    })}
     catch (error) {
         console.log(error);
         res.status(401).json({ "message": "Cannot signup at this moment.", "error": error })
