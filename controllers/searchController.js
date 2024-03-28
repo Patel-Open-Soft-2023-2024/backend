@@ -47,12 +47,15 @@ const autoComplete = async (req, res) => {
                     'score': {
                         '$meta': 'searchScore'
                     },
-                    // 'genres': 1,
+                    'genres': 1,
                     'poster': 1,
-                    // 'languages': 1,
-                    // 'imdb': 1,
-                    // 'year': 1,
-                    // 'directors': 1
+                    'languages': 1,
+                    'imdb': 1,
+                    'year': 1,
+                    'directors': 1,
+                    'cast': 1,
+                    'runtime': 1,
+                    'fullplot': 1
                 }
             },
             { "$sort": { "len": -1, "score": -1 } },
@@ -122,6 +125,13 @@ const autoComplete = async (req, res) => {
                     'languages': 1,
                     'imdb': 1,
                     'year': 1,
+                    'genres': 1,
+                    'plot': 1,
+                    'directors': 1,
+                    'cast': 1,
+                    'runtime': 1,
+                    'fullplot': 1
+
                     // "score": { "$meta": "searchScore" }
                 }
             },
@@ -169,6 +179,13 @@ const autoComplete = async (req, res) => {
                     'languages': 1,
                     'imdb': 1,
                     'year': 1,
+                    'genres': 1,
+                    'plot': 1,
+                    'directors': 1,
+                    'cast': 1,
+                    'runtime': 1,
+                    'fullplot': 1
+
                 }
             },
             { "$sort": { "len": -1, "score": -1 } },
@@ -215,6 +232,12 @@ const autoComplete = async (req, res) => {
                     'languages': 1,
                     'imdb': 1,
                     'year': 1,
+                    'genres': 1,
+                    'plot': 1,
+                    'directors': 1,
+                    'cast': 1,
+                    'runtime': 1,
+                    'fullplot': 1
                 }
             },
             { "$sort": { "len": -1, "score": -1 } },
@@ -254,6 +277,13 @@ const autoComplete = async (req, res) => {
                     'languages': 1,
                     'imdb': 1,
                     'year': 1,
+                    'genres': 1,
+                    'plot': 1,
+                    'directors': 1,
+                    'cast': 1,
+                    'runtime': 1,
+                    'fullplot': 1
+
                 }
             },
             { "$sort": { "len": -1, "score": -1 } },
@@ -325,6 +355,12 @@ const getSemanticSearch = async (req, res) => {
                         'languages': 1,
                         'imdb': 1,
                         'year': 1,
+                        'genres': 1,
+                        'plot': 1,
+                        'directors': 1,
+                        'cast': 1,
+                        'runtime': 1,
+                        'fullplot': 1,
                     }
                 }
             ];

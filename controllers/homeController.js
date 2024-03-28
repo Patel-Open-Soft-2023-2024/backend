@@ -19,7 +19,10 @@ async function getMovieSection(section) {
             'languages':1,
             'imdb':1,
             'year':1,
-            'directors':1
+          'directors': 1,
+          'cast': 1,
+          'runtime': 1,
+          'fullplot': 1,
         }
       }
     ];
@@ -59,7 +62,10 @@ const getRandom = async (req, res) => {
           'languages':1,
           'imdb':1,
           'year':1,
-          'directors':1
+        'directors': 1,
+        'cast': 1,
+        'runtime': 1,
+        'fullplot': 1,
       }
     }
   ];

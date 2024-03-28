@@ -321,7 +321,10 @@ const getProfileHistory = async (profileId) => {
                     languages: movie.languages,
                     imdb: movie.imdb,
                     year: movie.year,
-                    directors: movie.directors
+                  directors: movie.directors,
+                  runtime: movie.runtime,
+                  fullplot: movie.fullplot,
+                  cast: movie.cast
                 };
             });
             return movieDetailsFiltered;
@@ -368,7 +371,11 @@ const getWatchlistOfProfile = async (profileId) => {
                     languages: movie.languages,
                     imdb: movie.imdb,
                     year: movie.year,
-                    directors: movie.directors
+                  directors: movie.directors,
+                  runtime: movie.runtime,
+                  fullplot: movie.fullplot,
+                  cast: movie.cast
+
                 };
             });
             return movieDetailsFiltered;
@@ -409,7 +416,10 @@ const getSimilarMovies = async (movie_id) => {
             'languages':1,
             'imdb':1,
             'year':1,
-            'directors':1
+        'directors': 1,
+        'cast': 1,
+        'runtime': 1,
+        'fullplot': 1
         
       }
     }
