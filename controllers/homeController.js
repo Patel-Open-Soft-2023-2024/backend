@@ -54,6 +54,7 @@ const getRandom = async (req, res) => {
     }
   ];
   const result = await movieDB.aggregate(pipeline).toArray();
+  insertPreviewLink(result);
   res.status(200).json(result);
 }
 

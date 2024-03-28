@@ -33,7 +33,8 @@ router.post("/createuser", createUser);
 router.delete("/deleteuser:id", deleteUser);
 router.post("/addmovie:id", addMovieToWatchlist);
 router.post("/removemovie:id", removeMovieFromWatchlist);
-router.get("/favourites",)
+router.get("/favourites",/* my list of users*/);
+
 // router.post("/publish", publishMessage);
 router.post("/login", login);
 router.post("/signup", signup);
