@@ -59,7 +59,6 @@ function insertPreviewLink(movieList) {
         const objectId = movie._id;
         const decimalRepresentation = BigInt('0x' + objectId);
         const hashValue = Number((decimalRepresentation % BigInt(rangeMax)));
-        console.log("hashValue", hashValue, "movieLinksList[hashValue]", movieLinksList[hashValue]);
         movie.previewLink = movieLinksList[hashValue].getPreviewLink();
     });
 

@@ -2,13 +2,12 @@ const { ObjectId } = require("mongodb");
 const mongoUtil = require("../utils/mongoUtil");
 const {insertPreviewLink} = require("../utils/movieLinkUtil");
 
-const getHome = async (req, res) => {
-
+async function getMovieSection(section) {
     const movieDB = mongoUtil.getDB().collection("embedded_movies");
     const pipeline = [
       {
         '$sample': {
-          'size': 20
+          'size': 5
         }
       }, {
         '$project': {
@@ -26,7 +25,19 @@ const getHome = async (req, res) => {
     ];
     const result = await movieDB.aggregate(pipeline).toArray();
     insertPreviewLink(result);
-    res.status(200).json(result);
+    return result;
+}
+
+const getHome = async (req, res) => {
+  const sections = ["Trending", "Top Rated", "Action", "Romance", "Comedy"];
+  var moviesJson = {};
+  Promise.all(
+    sections.map(async (section) => {
+      moviesJson[section] = await getMovieSection(section);
+    })
+  ).then(() => {
+    res.status(200).json(moviesJson);
+  });
 }
 
 
