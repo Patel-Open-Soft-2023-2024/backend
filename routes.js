@@ -24,7 +24,7 @@ router.get("/random" ,getRandom);
 router.get("/section/:name", getSection);
 router.get("/movie/:id", getMovies);
 router.get("/search", autoComplete);
-router.post("/search/semantic", getSemanticSearch);
+router.get("/search/semantic", getSemanticSearch);
 router.get("/movie/similar/:id", getSimilarMovies);
 // router.post("/moresearch", getMoreResults);
 

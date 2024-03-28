@@ -1,5 +1,6 @@
 require("dotenv").config({ path: "../config.env" });
 const mongoUtil = require('../utils/mongoUtil')
+const {insertPreviewLink} = require('../utils/movieLinkUtil');
 
 const autoComplete = async (req, res) => {
     console.log(req.query.movie);
@@ -61,6 +62,7 @@ const autoComplete = async (req, res) => {
         ]
         try {
             const data = await movies.aggregate(autoCompletePipeline).toArray();
+            insertPreviewLink(data);
             res.status(200).json({ data: data });
         }
         catch (error) {
@@ -262,7 +264,9 @@ const autoComplete = async (req, res) => {
 
         try {
             Promise.all([movies.aggregate(titlePipeline).toArray(), movies.aggregate(directorPipeline).toArray(), movies.aggregate(castPipeline).toArray(), movies.aggregate(genresPipeline).toArray()]).then((result) => { 
-                
+                for(let i=0;i<result.length;i++){
+                    insertPreviewLink(result[i]);
+                }
                 res.status(200).json({ "title": result[0], "cast": result[2], "directors": result[1], "genres": result[3] })
             })
             // const title = await movies.aggregate(titlePipeline).toArray();
@@ -287,7 +291,7 @@ const autoComplete = async (req, res) => {
 const getSemanticSearch = async (req, res) => {
     const movieDB = mongoUtil.getDB().collection("embedded_movies");
     const body = {
-        "input": req.body.query,
+        "input": req.query.movie,
         "model": "text-embedding-ada-002",
     }
     try {
@@ -326,6 +330,7 @@ const getSemanticSearch = async (req, res) => {
             ];
 
             const result = await movieDB.aggregate(pipeline).toArray();
+            insertPreviewLink(result);
             res.json(result);
         }).catch((error) => {
             console.log(error);
