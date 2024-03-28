@@ -1,10 +1,10 @@
 const express = require('express');
-const { getSimilarMovies} = require('./controllers/moviesController');
+const { getSimilarMovies,getMovies} = require('./controllers/moviesController');
 const { autoComplete, getSemanticSearch } = require('./controllers/searchController');
 const { isAuthenticated } = require('./middleware/isAuthenticated');
 const { getUsers, getUserById, updateUser, createUser, deleteUser, addMovieToWatchlist, removeMovieFromWatchlist, login, googleLogin, logout, signup, createOrder, verifyOrder,addHistoryProfile,getHomeData,addWatchlistToProfile, getMovieVideoById } = require('./controllers/userController');
 const { publishMessage } = require('./controllers/redisController');
-const { getHome } = require('./controllers/homeController');
+const { getHome,getRandom } = require('./controllers/homeController');
 
 const router = express.Router();
 
@@ -19,7 +19,8 @@ router.post("/", async (req, res) => {
 //------------------------------------------------
 
 router.get("/home" ,getHome);
-// router.get("/movie/:id", getMovies);
+router.get("/random" ,getRandom);
+router.get("/movie/:id", getMovies);
 router.get("/search", autoComplete);
 router.post("/search/semantic", getSemanticSearch);
 router.get("/movie/similar/:id", getSimilarMovies);
@@ -31,7 +32,8 @@ router.post("/updateuser", updateUser);
 router.post("/createuser", createUser);
 router.delete("/deleteuser:id", deleteUser);
 router.post("/addmovie:id", addMovieToWatchlist);
-router.post("/removie:id", removeMovieFromWatchlist);
+router.post("/removemovie:id", removeMovieFromWatchlist);
+router.get("/favourites",)
 // router.post("/publish", publishMessage);
 router.post("/login", login);
 router.post("/signup", signup);

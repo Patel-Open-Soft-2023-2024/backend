@@ -5,20 +5,20 @@ const mongoUtil = require("../utils/mongoUtil");
 const getMovies = async (req, res) => {
   const { id } = req.params;
   const _id = ObjectId.createFromHexString(id);
-  console.log(id);
-  const result = await checkMovie(id);
-  if (result) {
-    console.log("From Cache");
-    const result2 = await getMovie(id);
-    res.status(200).json({ data: result2 });
-  }
-  else {
+  // console.log(id);
+  // const result = await checkMovie(id);
+  // if (result) {
+  //   console.log("From Cache");
+  //   const result2 = await getMovie(id);
+  //   res.status(200).json({ data: result2 });
+  // }
+  // else {
     const movies = mongoUtil.getDB().collection("movies");
     const movieDetails = await movies.find(_id).toArray();
-    await storeMovie(id, movieDetails);
-    console.log("From DB");
+    // await storeMovie(id, movieDetails);
+    // console.log("From DB");
     res.status(200).json({ data: movieDetails });
-  }
+  // }
 }
 
 const getSimilarMovies = async (req, res) => {
