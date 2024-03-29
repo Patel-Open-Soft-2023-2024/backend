@@ -17,7 +17,6 @@ const {
 const key_id = "rzp_test_J03FGVGxMcgSmP";
 const key_secret = "0fTBPksPGbrj7nWh8WSr";
 
-const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
 
 const createUser = async (req, res) => {
   try {

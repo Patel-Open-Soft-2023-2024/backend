@@ -37,6 +37,8 @@ const {
     signinWithEmailAndPassword,
 } = require("./controllers/firebaseAuthController");
 
+const { onSubscribe, redeemSubscription } = require('./controllers/paymentController');
+
 const router = express.Router();
 
 //-------------------------------------------------
@@ -89,9 +91,10 @@ router.get("/getmovievideo", getMovieVideoById);
 router.post("/getallprofile", getAllProfileofaUser);
 router.post("/createprofile", createProfile);
 // PAYMENT ROUTES
-router.post("/payment/createOrder", createOrder);
-router.post("/payment/verifyOrder", verifyOrder);
-router.post("/subscribe", onSubscribe);
+// router.post("/payment/createOrder", createOrder);
+// router.post("/payment/verifyOrder", verifyOrder);
+router.post("/subscribe",onSubscribe);
+router.get("/redeem", redeemSubscription);
 
 router.get("/private", isAuthenticated, (req, res) => {
     res.json(req.user);
