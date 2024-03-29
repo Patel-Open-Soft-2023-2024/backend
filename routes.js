@@ -25,6 +25,23 @@ const {
   getMovieVideoById,
   getAllProfileofaUser,
   createProfile,
+  getUsers,
+  getUserById,
+  updateUser,
+  createUser,
+  deleteUser,
+  addMovieToWatchlist,
+  removeMovieFromWatchlist,
+  createOrder,
+  verifyOrder,
+  onSubscribe,
+  addHistoryProfile,
+  getHomeData,
+  addWatchlistToProfile,
+  getMovieVideoById,
+  getAllProfileofaUser,
+  createProfile,
+  getFavoriteMovies,
 } = require("./controllers/userController");
 const { publishMessage } = require("./controllers/redisController");
 const {
@@ -37,7 +54,9 @@ const {
   signinWithEmailAndPassword,
 } = require("./controllers/firebaseAuthController");
 const { getLink } = require("./utils/movieLinkUtil");
+const { redeemSubscription } = require("./controllers/paymentController");
 
+// const { onSubscribe, redeemSubscription } = require('./controllers/paymentController');
 const router = express.Router();
 
 //-------------------------------------------------
@@ -72,13 +91,11 @@ router.post("/createuser", createUser);
 router.delete("/deleteuser:id", deleteUser);
 router.post("/addmovie:id", addMovieToWatchlist);
 router.post("/removemovie:id", removeMovieFromWatchlist);
-router.get("/favourites" /* my list of users*/);
-
+router.get("/favourites", getFavoriteMovies);
 // router.post("/publish", publishMessage);
 // router.post("/login", login);
 // router.post("/signup", signup);
 router.post("/signup", signupWithEmailAndPassword);
-router.post("/login", signinWithEmailAndPassword);
 router.post("/login", signinWithEmailAndPassword);
 
 router.post("/addwatchlist", addWatchlistToProfile);
@@ -88,12 +105,13 @@ router.get("/getmovievideo", getMovieVideoById);
 router.post("/getallprofile", getAllProfileofaUser);
 router.post("/createprofile", createProfile);
 // PAYMENT ROUTES
-router.post("/payment/createOrder", createOrder);
-router.post("/payment/verifyOrder", verifyOrder);
+// router.post("/payment/createOrder", createOrder);
+// router.post("/payment/verifyOrder", verifyOrder);
 router.post("/subscribe", onSubscribe);
 
 //MOVIE LINK
 router.get("/getlink:id", getLink);
+router.get("/redeem", redeemSubscription);
 
 router.get("/private", isAuthenticated, (req, res) => {
   res.json(req.user);

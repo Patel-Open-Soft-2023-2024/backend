@@ -12,7 +12,7 @@ const isAuthenticated = async (req, res, next) => {
         .verifyIdToken(token)
         .then((decodedToken) => {
             console.log(decodedToken)
-            req.user = decodedToken.uid;
+            req.uid = decodedToken.uid;
             next();
         })
         .catch((error) => {
