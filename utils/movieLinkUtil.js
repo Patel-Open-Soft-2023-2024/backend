@@ -48,12 +48,26 @@ const roadHouse = new MovieLinks(
     "Video/sample_540p.m3u8"
 );
 
+const baby_driver = new MovieLinks(
+    "baby_drive/baby_driver_preview.mp4",
+    "baby_driver/baby_driver_1080p.m3u8",
+    "baby_driver/baby_driver_720p.m3u8",
+    "baby_driver/baby_driver_540p.m3u8"
+);
+
+const singham = new MovieLinks(
+    "singham/singham_preview.mp4",
+    "singham/singham_1080p.m3u8",
+    "singham/singham_720p.m3u8",
+    "singham/singham_540p.m3u8"
+);
+
 // Adding instances to a list
-const movieLinksList = [oppenheimer, bigBuckBunny, roadHouse];
+const movieLinksList = [oppenheimer, bigBuckBunny, roadHouse, baby_driver, singham];
 
 
 
-const rangeMax = 3;
+const rangeMax = movieLinksList.length;
 function insertPreviewLink(movieList) {
     movieList.forEach(movie => {
         const objectId = movie._id;
