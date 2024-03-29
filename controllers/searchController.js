@@ -120,16 +120,6 @@ const autoComplete = async (req, res) => {
                                     "tokenOrder": "sequential",
                                 }
                             },
-                            {
-                                "text": {
-                                    "query": `${query_name}`,
-                                    "path": "title",
-                                    "fuzzy":
-                                    {
-                                        "maxEdits": 2
-                                    },
-                                }
-                            },
                         ]
                     }
                 }
@@ -182,7 +172,17 @@ const autoComplete = async (req, res) => {
                                     "path": "cast",
                                     "tokenOrder": "sequential",
                                 }
-                            }
+                            },
+                            {
+                                "text": {
+                                    "query": `${query_name}`,
+                                    "path": "cast",
+                                    "fuzzy":
+                                    {
+                                        "maxEdits": 2
+                                    },
+                                }
+                            },
                         ]
                     }
                 }
@@ -235,7 +235,17 @@ const autoComplete = async (req, res) => {
                                     "path": "directors",
                                     "tokenOrder": "sequential",
                                 }
-                            }
+                            },
+                            {
+                                "text": {
+                                    "query": `${query_name}`,
+                                    "path": "directors",
+                                    "fuzzy":
+                                    {
+                                        "maxEdits": 2
+                                    },
+                                }
+                            },
                         ]
                     }
                 }
@@ -281,7 +291,17 @@ const autoComplete = async (req, res) => {
                                     "path": "genres",
                                     "score": { "boost": { "value": 5 } }
                                 }
-                            }
+                            },
+                            {
+                                "text": {
+                                    "query": `${query_name}`,
+                                    "path": "generes",
+                                    "fuzzy":
+                                    {
+                                        "maxEdits": 2
+                                    },
+                                }
+                            },
                         ]
                     }
                 }
