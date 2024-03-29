@@ -42,7 +42,7 @@ router.get("/favourites",/* my list of users*/);
 // router.post("/login", login);
 // router.post("/signup", signup);
 router.post("/signup", signupWithEmailAndPassword);
-router.post("/signin", signinWithEmailAndPassword);
+router.post("/login", signinWithEmailAndPassword);
 
 router.get("/logout", logout);
 router.get("/googlelogin", googleLogin);
