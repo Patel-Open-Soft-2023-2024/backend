@@ -1,24 +1,27 @@
 const mongoUtil = require('../utils/mongoUtil')
-const {insertPreviewLink} = require('../utils/movieLinkUtil');
+const { insertPreviewLink } = require('../utils/movieLinkUtil');
 
 
- let black = (input) => '\x1b[30m' + input + '\x1b[0m'
- let red = (input) => '\x1b[31m' + input + '\x1b[0m'
- let green = (input) => '\x1b[32m' + input + '\x1b[0m'
- let yellow = (input) => '\x1b[33m' + input + '\x1b[0m'
- let blue = (input) => '\x1b[34m' + input + '\x1b[0m'
- let magenta = (input) => '\x1b[35m' + input + '\x1b[0m'
- let cyan = (input) => '\x1b[36m' + input + '\x1b[0m'
- let white = (input) => '\x1b[37m' + input + '\x1b[0m'
- let gray = (input) => '\x1b[90m' + input + '\x1b[0m'
+let black = (input) => '\x1b[30m' + input + '\x1b[0m'
+let red = (input) => '\x1b[31m' + input + '\x1b[0m'
+let green = (input) => '\x1b[32m' + input + '\x1b[0m'
+let yellow = (input) => '\x1b[33m' + input + '\x1b[0m'
+let blue = (input) => '\x1b[34m' + input + '\x1b[0m'
+let magenta = (input) => '\x1b[35m' + input + '\x1b[0m'
+let cyan = (input) => '\x1b[36m' + input + '\x1b[0m'
+let white = (input) => '\x1b[37m' + input + '\x1b[0m'
+let gray = (input) => '\x1b[90m' + input + '\x1b[0m'
 
 const autoComplete = async (req, res) => {
     const query_name = req.query.movie;
+    // hard coded user id
+    const userId = "6602c074a767bf239e5b70f9"
     // remove spaces from the string
     const query_no_space = query_name.replace(/\s+/g, '');
     const movies = mongoUtil.getDB().collection("movies");
+    const History = mongoUtil.getDB().collection("History");
     if (req.query.autocomplete) {
-        console.log(gray("auto:"),req.query.movie);
+        console.log(gray("auto:"), req.query.movie);
         const autoCompletePipeline = [
             {
                 "$search": {
@@ -71,7 +74,7 @@ const autoComplete = async (req, res) => {
                     'fullplot': 1
                 }
             },
-            { "$sort": { "len": -1, "score": -1 } },
+            { "$sort": { "score": -1 } },
             {
                 "$limit": 20
             },
@@ -87,7 +90,7 @@ const autoComplete = async (req, res) => {
         }
     }
     else {
-        console.log(blue("diverse:"),req.query.movie);
+        console.log(blue("diverse:"), req.query.movie);
         const titlePipeline = [
             {
                 "$search": {
@@ -144,12 +147,11 @@ const autoComplete = async (req, res) => {
                     'directors': 1,
                     'cast': 1,
                     'runtime': 1,
-                    'fullplot': 1
-
-                    // "score": { "$meta": "searchScore" }
+                    'fullplot': 1,
+                    "score": { "$meta": "searchScore" }
                 }
             },
-            { "$sort": { "len": -1, "score": -1 } },
+            { "$sort": { "score": -1 } },
             {
                 "$limit": 20
             },
@@ -198,11 +200,11 @@ const autoComplete = async (req, res) => {
                     'directors': 1,
                     'cast': 1,
                     'runtime': 1,
-                    'fullplot': 1
-
+                    'fullplot': 1,
+                    "score": { "$meta": "searchScore" }
                 }
             },
-            { "$sort": { "len": -1, "score": -1 } },
+            { "$sort": { "score": -1 } },
             {
                 "$limit": 20
             },
@@ -251,10 +253,11 @@ const autoComplete = async (req, res) => {
                     'directors': 1,
                     'cast': 1,
                     'runtime': 1,
-                    'fullplot': 1
+                    'fullplot': 1,
+                    "score": { "$meta": "searchScore" }
                 }
             },
-            { "$sort": { "len": -1, "score": -1 } },
+            { "$sort": { "score": -1 } },
             {
                 "$limit": 20
             },
@@ -296,20 +299,30 @@ const autoComplete = async (req, res) => {
                     'directors': 1,
                     'cast': 1,
                     'runtime': 1,
-                    'fullplot': 1
-
+                    'fullplot': 1,
+                    "score": { "$meta": "searchScore" }
                 }
             },
-            { "$sort": { "len": -1, "score": -1 } },
+            { "$sort": { "score": -1 } },
             {
                 "$limit": 20
             },
         ]
 
         try {
-            Promise.all([movies.aggregate(titlePipeline).toArray(), movies.aggregate(directorPipeline).toArray(), movies.aggregate(castPipeline).toArray(), movies.aggregate(genresPipeline).toArray()]).then((result) => { 
-                for(let i=0;i<result.length;i++){
+            Promise.all([movies.aggregate(titlePipeline).toArray(), movies.aggregate(directorPipeline).toArray(), movies.aggregate(castPipeline).toArray(), movies.aggregate(genresPipeline).toArray(), History.find({ Profile_id: userId }).toArray()]).then((result) => {
+                const userHistoryMovieIDs = result[4].map(movie => movie.Movie_id.toString());
+                console.log({userHistoryMovieIDs});
+                for (let i = 0; i < result.length - 1; i++) {
                     insertPreviewLink(result[i]);
+                    const updatedMovies = result[i].map(movie => {
+                        if (userHistoryMovieIDs.includes(movie._id.toString())) {
+                            // Assume movie object has a 'score' field. Increase it by 1 or any value you see fit.
+                            movie.score *= 5;
+                        }
+                        return movie;
+                    });
+                    result[i] = updatedMovies.sort((a, b) => b.score - a.score);
                 }
                 res.status(200).json({ "title": result[0], "cast": result[2], "directors": result[1], "genres": result[3] })
             })
@@ -333,7 +346,7 @@ const autoComplete = async (req, res) => {
 // }
 
 const getSemanticSearch = async (req, res) => {
-    console.log(green("semantic:"),req.query.movie);
+    console.log(green("semantic:"), req.query.movie);
     const movieDB = mongoUtil.getDB().collection("embedded_movies");
     const body = {
         "input": req.query.movie,
