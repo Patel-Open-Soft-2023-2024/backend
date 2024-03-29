@@ -9,23 +9,21 @@ const {
 } = require("./controllers/searchController");
 const { isAuthenticated } = require("./middleware/isAuthenticated");
 const {
-  getUsers,
-  getUserById,
-  updateUser,
-  createUser,
-  deleteUser,
-  addMovieToWatchlist,
-  removeMovieFromWatchlist,
-  createOrder,
-  verifyOrder,
-  onSubscribe,
-  addHistoryProfile,
-  getHomeData,
-  addWatchlistToProfile,
-  getMovieVideoById,
-  getAllProfileofaUser,
-  createProfile,
-  getFavoriteMovies,
+    getUsers,
+    getUserById,
+    updateUser,
+    createUser,
+    deleteUser,
+    addMovieToWatchlist,
+    removeMovieFromWatchlist,
+    createOrder,
+    verifyOrder,
+    addHistoryProfile,
+    getHomeData,
+    addWatchlistToProfile,
+    getMovieVideoById,
+    getAllProfileofaUser,
+    createProfile,
 } = require("./controllers/userController");
 const { publishMessage } = require("./controllers/redisController");
 const {
@@ -95,7 +93,7 @@ router.post("/subscribe", onSubscribe);
 
 //MOVIE LINK
 router.get("/getlink:id", getLink);
-router.get("/redeem", redeemSubscription);
+router.post("/redeem", redeemSubscription);
 
 router.get("/private", isAuthenticated, (req, res) => {
   res.json(req.user);

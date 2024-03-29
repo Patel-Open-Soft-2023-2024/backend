@@ -48,6 +48,8 @@ const onSubscribe = async (req, res) => {
         success_url: `${process.env.CLIENT_URL}/success?redeemKey=${transactionSecretKey}`,
         cancel_url: `${process.env.CLIENT_URL}/cancel`,
         });
+
+        console.log({transactionSecretKey});
         res.json({ url: session.url })
     } catch (e) {
         res.status(500).json({ error: e.message })
@@ -57,14 +59,22 @@ const onSubscribe = async (req, res) => {
 
 const redeemSubscription = async (req, res) => {
     try {
-        const { transactionKey } = req.query;
-        const planID = pendingTransactions[transactionKey];
+        const { redeemKey } = req.body;
+        const planID = pendingTransactions[redeemKey];
         if (!planID)
-            res.status(404).json({ error: "Transaction Key not found or invalid!" });
+            res.status(200).json({ msg: "Transaction Key not found or invalid!" });
         else{  
-            delete pendingTransactions[transactionKey];
+            // SUCCESS
+            delete pendingTransactions[redeemKey];
             console.log("Transaction successful for plan", planID);
-            res.json({ planID });
+
+            // update subscription in user collection
+            user=mongoUtil.getDB().collection("User");
+            user.updateOne({uid:req.param.uid},{$set:{subscription:planID}});
+
+
+            res.status(200).json({ msg: "Transaction successful for plan "+ planID });
+
         }
     } catch (e) {
         res.status(500).json({ error: e.message });
