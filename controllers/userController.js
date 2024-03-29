@@ -599,9 +599,11 @@ const getHomeData = async (req, res) => {
     }
     //ADD MOVIE_NAME AS KEY TO SIMILAR MOVIES
     res.status(200).json({
-      watchlist: result,
-      history: result2,
-      similar_movie: { [movie_name]: similar_movies },
+      latest_movie: result3,
+      best_imdb_movie: result4,
+      best_tomato_movie: result5,
+      best_english_movie: result6,
+      best_hindi_movie: result7,
     });
   } catch (error) {
     console.log(error);
