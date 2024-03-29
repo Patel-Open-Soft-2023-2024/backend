@@ -2,7 +2,7 @@ const express = require('express');
 const { getSimilarMovies,getMovies} = require('./controllers/moviesController');
 const { autoComplete, getSemanticSearch } = require('./controllers/searchController');
 const { isAuthenticated } = require('./middleware/isAuthenticated');
-const { getUsers, getUserById, updateUser, createUser, deleteUser, addMovieToWatchlist, removeMovieFromWatchlist, login, googleLogin, logout, signup, createOrder, verifyOrder,onSubscribe,addHistoryProfile,getHomeData,addWatchlistToProfile, getMovieVideoById } = require('./controllers/userController');
+const { getUsers, getUserById, updateUser, createUser, deleteUser, addMovieToWatchlist, removeMovieFromWatchlist, createOrder, verifyOrder,onSubscribe,addHistoryProfile,getHomeData,addWatchlistToProfile, getMovieVideoById } = require('./controllers/userController');
 const { publishMessage } = require('./controllers/redisController');
 const { getHome,getRandom, getSection } = require('./controllers/homeController');
 const { signupWithEmailAndPassword, signinWithEmailAndPassword } = require('./controllers/firebaseAuthController');
@@ -44,8 +44,6 @@ router.get("/favourites",/* my list of users*/);
 router.post("/signup", signupWithEmailAndPassword);
 router.post("/login", signinWithEmailAndPassword);
 
-router.get("/logout", logout);
-router.get("/googlelogin", googleLogin);
 router.post("/addwatchlist", addWatchlistToProfile);
 router.get("/homedata", getHomeData);
 router.post("/addhistory", addHistoryProfile);

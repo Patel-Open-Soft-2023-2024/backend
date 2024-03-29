@@ -1,11 +1,6 @@
 const mongoUtil = require("../utils/mongoUtil");
 const { ObjectId } = require("mongodb");
 const { auth } = require("../utils/firebaseUtil.js");
-const {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut,
-} = require("firebase/auth");
 const Razorpay = require("razorpay");
 const {
   validatePaymentVerification,
@@ -149,97 +144,6 @@ const removeMovieFromWatchlist = async (req, res) => {
   }
 };
 
-const login = async (req, res) => {
-  console.log(req.body);
-  await signInWithEmailAndPassword(auth, req.body.email, req.body.password)
-    .then((userCredential) => {
-      const user = userCredential.user;
-      console.log(user);
-      res.status(200).json(user);
-    })
-    .catch((error) => {
-      console.log(error.message);
-      res.status(500).json({ error: error.message });
-    });
-};
-
-const signup = async (req, res) => {
-  createUserWithEmailAndPassword(auth, req.body.email, req.body.password)
-    .then(async (userCredential) => {
-      const user = userCredential.user;
-      console.log(user);
-      try {
-        const newUser = {
-          _id: new ObjectId(),
-          uid: user.uid,
-          Name: req.body.name,
-          Email: req.body.email,
-          Subscription: "None",
-        };
-        const result = await mongoUtil
-          .getDB()
-          .collection("User")
-          .insertOne(newUser);
-        // const result = await users.insertOne(newUser);
-        console.log(result.insertedId);
-        const newProfile = {
-          _id: new ObjectId(),
-          uid: result.insertedId,
-          Profile_name: req.body.name,
-        };
-        const default_profile = await mongoUtil
-          .getDB()
-          .collection("Profile")
-          .insertOne(newProfile);
-        // add profile id to headers
-        // req.headers.profile_name = default_profile.Profile_name;
-        // req.headers.profile_id = default_profile.insertedId;
-        login(req, res);
-        // const users_ = await mongoUtil.getDB().collection('User').find({}).toArray();
-        // console.log(users_);
-        res.status(201).json(result);
-      } catch (error) {
-        console.log(error);
-        // return res;
-      }
-      // req.uid = user.uid;
-      // createUser(req, res);
-    })
-    .catch((error) => {
-      console.log(error.message);
-      res.status(500).json({ error: error.message });
-    });
-};
-
-const logout = async (req, res) => {
-  signOut(auth)
-    .then(() => {
-      console.log("User signed out");
-      res.status(200).json({ message: "User signed out" });
-    })
-    .catch((error) => {
-      console.log(error.message);
-    });
-};
-
-const googleLogin = async (req, res) => {
-  const provider = new GoogleAuthProvider();
-  signInWithPopup(auth, provider)
-    .then((result) => {
-      const credential = GoogleAuthProvider.credentialFromResult(result);
-      const token = credential.accessToken;
-      const user = result.user;
-      console.log(user);
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      const email = error.email;
-      const credential = GoogleAuthProvider.credentialFromError(error);
-      console.log(errorMessage);
-    });
-};
-
 function generateUniqueString() {
   const timestamp = Date.now();
   const randomSuffix = Math.random().toString(36).substr(2);
@@ -292,16 +196,16 @@ const verifyOrder = (req, res) => {
 
 // stripe payment (2)
 
-const plans =[
-  {id:"basic" ,name: "Basic", price: "Rs 59",priceInPaise:59*100, benefits: ["Standard Definition (SD)","1 screen"]},
-  {id:"standard", name: "Standard", price: "Rs 199",priceInPaise:199*100, benefits: ["High Definition (HD)","2 screens"]},
-  {id:"premium", name: "Premium", price: "Rs 349", priceInPaise:349*100, benefits: ["Ultra High Definition (UHD)","4 screens"]},
+const plans = [
+  { id: "basic", name: "Basic", price: "Rs 59", priceInPaise: 59 * 100, benefits: ["Standard Definition (SD)", "1 screen"] },
+  { id: "standard", name: "Standard", price: "Rs 199", priceInPaise: 199 * 100, benefits: ["High Definition (HD)", "2 screens"] },
+  { id: "premium", name: "Premium", price: "Rs 349", priceInPaise: 349 * 100, benefits: ["Ultra High Definition (UHD)", "4 screens"] },
 ]
 
 // use 4000003560000008 as card number for testing
-const onSubscribe=async (req, res) => {
+const onSubscribe = async (req, res) => {
   try {
-    const planID=req.query.plan;
+    const planID = req.query.plan;
     //find match of plan with id in plans
     const planMatch = plans.find((plan) => plan.id === planID);
     if (!planMatch) throw Error("plan not found");
@@ -310,14 +214,14 @@ const onSubscribe=async (req, res) => {
       mode: "payment",
       line_items: [
         {
-          price_data:{
-            currency:"inr",
-            product_data:{
-              name:planMatch.id
+          price_data: {
+            currency: "inr",
+            product_data: {
+              name: planMatch.id
             },
-            unit_amount:planMatch.priceInPaise
+            unit_amount: planMatch.priceInPaise
           },
-          quantity:1
+          quantity: 1
         }],
       success_url: `${process.env.CLIENT_URL}/success.html`,
       cancel_url: `${process.env.CLIENT_URL}/cancel.html`,
@@ -331,108 +235,108 @@ const onSubscribe=async (req, res) => {
 
 //FOR PROFILE HISTORY
 const addHistoryProfile = async (req, res) => {
-    try {
-        const profile = mongoUtil.getDB().collection("History");
-        const profileId = req.body.profile;
-        const movieId = req.body.movie;
-        const result = await profile.insertOne({ _id:new ObjectId(),Profile_id: profileId, Movie_id: movieId});
-        res.status(200).json({ message: "History added to profile successfully" });
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ error: "Internal server error" });
-    }
+  try {
+    const profile = mongoUtil.getDB().collection("History");
+    const profileId = req.body.profile;
+    const movieId = req.body.movie;
+    const result = await profile.insertOne({ _id: new ObjectId(), Profile_id: profileId, Movie_id: movieId });
+    res.status(200).json({ message: "History added to profile successfully" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
 //Get Profile History
 const getProfileHistory = async (profileId) => {
-    try {
-        const history = mongoUtil.getDB().collection("History");
-        const result = await history.find({ Profile_id: profileId }).toArray();
-        if (result) {
-            //RETURNING THE MOVIE DETAIL FROM MOVIE COLLECTION
-            const movie = mongoUtil.getDB().collection("embedded_movies");
-            // Get all the movie ids from the result and then get the movie details from the movie collection
-            const movieIds = result.map((item) => new ObjectId(item.Movie_id));
-            const movieDetails = await movie.find({ _id: { $in: movieIds } }).toArray();
-            const movieDetailsFiltered = movieDetails.map((movie) => {
-                return {
-                    _id: movie._id,
-                    title: movie.title,
-                    plot: movie.plot,
-                    genres: movie.genres,
-                    poster: movie.poster,
-                    languages: movie.languages,
-                    imdb: movie.imdb,
-                    year: movie.year,
-                  directors: movie.directors,
-                  runtime: movie.runtime,
-                  fullplot: movie.fullplot,
-                  cast: movie.cast
-                };
-            });
-            return movieDetailsFiltered;
-        } else {
-          return None;
-        }
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ error: "Internal server error" });
+  try {
+    const history = mongoUtil.getDB().collection("History");
+    const result = await history.find({ Profile_id: profileId }).toArray();
+    if (result) {
+      //RETURNING THE MOVIE DETAIL FROM MOVIE COLLECTION
+      const movie = mongoUtil.getDB().collection("embedded_movies");
+      // Get all the movie ids from the result and then get the movie details from the movie collection
+      const movieIds = result.map((item) => new ObjectId(item.Movie_id));
+      const movieDetails = await movie.find({ _id: { $in: movieIds } }).toArray();
+      const movieDetailsFiltered = movieDetails.map((movie) => {
+        return {
+          _id: movie._id,
+          title: movie.title,
+          plot: movie.plot,
+          genres: movie.genres,
+          poster: movie.poster,
+          languages: movie.languages,
+          imdb: movie.imdb,
+          year: movie.year,
+          directors: movie.directors,
+          runtime: movie.runtime,
+          fullplot: movie.fullplot,
+          cast: movie.cast
+        };
+      });
+      return movieDetailsFiltered;
+    } else {
+      return None;
     }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
 // ADDING WATCHLIST TO PROFILE
 const addWatchlistToProfile = async (req, res) => {
-    try {
-        const profile = mongoUtil.getDB().collection("Watch_list");
-        const profileId = req.body.profile;
-        const movieId = req.body.movie;
-        const result = await profile.insertOne({ _id:new ObjectId(),Profile_id: profileId, Movie_id: movieId});
-        res.status(200).json({ message: "Watchlist added to profile successfully" });
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ error: "Internal server error" });
-    }
+  try {
+    const profile = mongoUtil.getDB().collection("Watch_list");
+    const profileId = req.body.profile;
+    const movieId = req.body.movie;
+    const result = await profile.insertOne({ _id: new ObjectId(), Profile_id: profileId, Movie_id: movieId });
+    res.status(200).json({ message: "Watchlist added to profile successfully" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
 // GETTING WATCHLIST OF PROFILE
 const getWatchlistOfProfile = async (profileId) => {
-    try {
-        const profile = mongoUtil.getDB().collection("Watch_list");
-        const result = await profile.find({ Profile_id: profileId }).toArray();
-        if (result) {
-                        const movie = mongoUtil.getDB().collection("embedded_movies");
-            // Get all the movie ids from the result and then get the movie details from the movie collection
-            const movieIds = result.map((item) => new ObjectId(item.Movie_id));
-            const movieDetails = await movie.find({ _id: { $in: movieIds } }).toArray();
-            const movieDetailsFiltered = movieDetails.map((movie) => {
-                return {
-                    _id: movie._id,
-                    title: movie.title,
-                    plot: movie.plot,
-                    genres: movie.genres,
-                    poster: movie.poster,
-                    languages: movie.languages,
-                    imdb: movie.imdb,
-                    year: movie.year,
-                  directors: movie.directors,
-                  runtime: movie.runtime,
-                  fullplot: movie.fullplot,
-                  cast: movie.cast
+  try {
+    const profile = mongoUtil.getDB().collection("Watch_list");
+    const result = await profile.find({ Profile_id: profileId }).toArray();
+    if (result) {
+      const movie = mongoUtil.getDB().collection("embedded_movies");
+      // Get all the movie ids from the result and then get the movie details from the movie collection
+      const movieIds = result.map((item) => new ObjectId(item.Movie_id));
+      const movieDetails = await movie.find({ _id: { $in: movieIds } }).toArray();
+      const movieDetailsFiltered = movieDetails.map((movie) => {
+        return {
+          _id: movie._id,
+          title: movie.title,
+          plot: movie.plot,
+          genres: movie.genres,
+          poster: movie.poster,
+          languages: movie.languages,
+          imdb: movie.imdb,
+          year: movie.year,
+          directors: movie.directors,
+          runtime: movie.runtime,
+          fullplot: movie.fullplot,
+          cast: movie.cast
 
-                };
-            });
-            return movieDetailsFiltered;
-        } else {
-          return None;
-        }
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ error: "Internal server error" });
+        };
+      });
+      return movieDetailsFiltered;
+    } else {
+      return None;
     }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
 const getSimilarMovies = async (movie_id) => {
-  const _id=movie_id;
+  const _id = movie_id;
   const movieDB = mongoUtil.getDB().collection("embedded_movies");
   const vector_embeddings = await movieDB.find({ _id }).project({ "plot_embedding": 1, "_id": 0 }).toArray();
   // console.log(vector_embeddings)
@@ -454,16 +358,16 @@ const getSimilarMovies = async (movie_id) => {
         'score': {
           '$meta': 'vectorSearchScore',
         },
-          'genres':1,
-            'poster':1,
-            'languages':1,
-            'imdb':1,
-            'year':1,
+        'genres': 1,
+        'poster': 1,
+        'languages': 1,
+        'imdb': 1,
+        'year': 1,
         'directors': 1,
         'cast': 1,
         'runtime': 1,
         'fullplot': 1
-        
+
       }
     }
   ];
@@ -491,10 +395,12 @@ const getHomeData = async (req, res) => {
     //GET _id of first movie of history
     const movie_id = result2[0]._id;
     const movie_name = result2[0].title;
-    //Get similar movies
-    const similar_movies = await getSimilarMovies(movie_id);
+    const genres = result2[0].genres;
+    const similar_movies = await getSimilarMovies(movie_id);     //Get similar movies
+    const movies_by_genres = await getMoviesByGenres(genres);
+    console.log(movies_by_genres);
     //ADD MOVIE_NAME AS KEY TO SIMILAR MOVIES
-    res.status(200).json({ watchlist: result, history: result2, similar_movie: { [movie_name]:similar_movies } });
+    res.status(200).json({ watchlist: result, history: result2, similar_movie: { [movie_name]: similar_movies }, genres: {...movies_by_genres} });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal server error" });
@@ -502,45 +408,87 @@ const getHomeData = async (req, res) => {
 };
 
 function hexToDecimalUsingMap(hexString) {
-    const hexCharacters = '0123456789ABCDEF';
-    let decimal = 0;
-    hexString.toUpperCase().split('').forEach((char, index) => {
-        const value = hexCharacters.indexOf(char);
-        if (value === -1) {
-            throw new Error('Invalid hexadecimal character found');
+  const hexCharacters = '0123456789ABCDEF';
+  let decimal = 0;
+  hexString.toUpperCase().split('').forEach((char, index) => {
+    const value = hexCharacters.indexOf(char);
+    if (value === -1) {
+      throw new Error('Invalid hexadecimal character found');
+    }
+    decimal += value;
+    decimal = decimal % 3;
+  });
+
+  return decimal;
+}
+
+const getMoviesByGenres = async (genres) => {
+  const movieDB = mongoUtil.getDB().collection("movies");
+  const result = {};
+  await Promise.all(genres.map(async (genre) => {
+    const data = await movieDB.aggregate([
+      {
+        "$search": {
+          "index": "default",
+          "text": {
+            "query": `${genre}`,
+            "path": "genres"
+          },
         }
-        decimal += value;
-        decimal=decimal%3;
-    });
-  
-    return decimal;
+      },
+      {
+        "$project": {
+          '_id': 1,
+          'plot': 1,
+          'title': 1,
+          'score': {
+            '$meta': 'searchScore'
+          },
+          'genres': 1,
+          'poster': 1,
+          'languages': 1,
+          'imdb': 1,
+          'year': 1,
+          'directors': 1,
+          'cast': 1,
+          'runtime': 1,
+          'fullplot': 1
+        }
+      },
+      { "$sort": { "score": -1 } },
+      { "$limit": 1 },
+    ]).toArray();
+    result[genre] = data;
+  }));
+  console.log(result);
+  return result;
 }
 
 const getMovieVideoById = async (req, res) => {
   movie_video_urls_list = {
-  "1": {
-    "previewLink": "https://dge8ab9n7stt8.cloudfront.net/Oppenheimer/Oppenheimer_preview.mp4",
-    "premiumLink": "https://dge8ab9n7stt8.cloudfront.net/Oppenheimer/Oppenheimer _1080p.m3u8",
-    "standardLink": "https://dge8ab9n7stt8.cloudfront.net/Oppenheimer/Oppenheimer _720p.m3u8",
-    "basicLink": "https://dge8ab9n7stt8.cloudfront.net/Oppenheimer/Oppenheimer _540p.m3u8"
-  },
-  "2": {
-    "previewLink": "https://dge8ab9n7stt8.cloudfront.net/BigBuckBunny/BigBuckBunny_preview.mp4",
-    "premiumLink": "https://dge8ab9n7stt8.cloudfront.net/BigBuckBunny/BigBuckBunny1080p.m3u8",
-    "standardLink": "https://dge8ab9n7stt8.cloudfront.net/BigBuckBunny/BigBuckBunny720p.m3u8",
-    "basicLink": "https://dge8ab9n7stt8.cloudfront.net/BigBuckBunny/BigBuckBunny540p.m3u8"
-  },
-  "3": {
-    "previewLink": "https://dge8ab9n7stt8.cloudfront.net/Video/preview_Road_House.mp4",
-    "premiumLink": "https://dge8ab9n7stt8.cloudfront.net/Video/sample_1080p.m3u8",
-    "standardLink": "https://dge8ab9n7stt8.cloudfront.net/Video/sample_720p.m3u8",
-    "basicLink": "https://dge8ab9n7stt8.cloudfront.net/Video/sample_540p.m3u8"
+    "1": {
+      "previewLink": "https://dge8ab9n7stt8.cloudfront.net/Oppenheimer/Oppenheimer_preview.mp4",
+      "premiumLink": "https://dge8ab9n7stt8.cloudfront.net/Oppenheimer/Oppenheimer _1080p.m3u8",
+      "standardLink": "https://dge8ab9n7stt8.cloudfront.net/Oppenheimer/Oppenheimer _720p.m3u8",
+      "basicLink": "https://dge8ab9n7stt8.cloudfront.net/Oppenheimer/Oppenheimer _540p.m3u8"
+    },
+    "2": {
+      "previewLink": "https://dge8ab9n7stt8.cloudfront.net/BigBuckBunny/BigBuckBunny_preview.mp4",
+      "premiumLink": "https://dge8ab9n7stt8.cloudfront.net/BigBuckBunny/BigBuckBunny1080p.m3u8",
+      "standardLink": "https://dge8ab9n7stt8.cloudfront.net/BigBuckBunny/BigBuckBunny720p.m3u8",
+      "basicLink": "https://dge8ab9n7stt8.cloudfront.net/BigBuckBunny/BigBuckBunny540p.m3u8"
+    },
+    "3": {
+      "previewLink": "https://dge8ab9n7stt8.cloudfront.net/Video/preview_Road_House.mp4",
+      "premiumLink": "https://dge8ab9n7stt8.cloudfront.net/Video/sample_1080p.m3u8",
+      "standardLink": "https://dge8ab9n7stt8.cloudfront.net/Video/sample_720p.m3u8",
+      "basicLink": "https://dge8ab9n7stt8.cloudfront.net/Video/sample_540p.m3u8"
+    }
   }
-}
   try {
     var movie_id = req.body.movie_id;
     const sub = req.body.video_type;
-    movie_id=hexToDecimalUsingMap(movie_id);
+    movie_id = hexToDecimalUsingMap(movie_id);
     const movie = movie_video_urls_list[movie_id][sub];
     res.status(200).json({ movie: movie });
 
@@ -560,10 +508,6 @@ module.exports = {
   deleteUser,
   addMovieToWatchlist,
   removeMovieFromWatchlist,
-  login,
-  signup,
-  logout,
-  googleLogin,
   createOrder,
   verifyOrder,
   onSubscribe,
