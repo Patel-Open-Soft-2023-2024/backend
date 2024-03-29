@@ -1,5 +1,6 @@
 const { ObjectId } = require("mongodb");
 const mongoUtil = require("../utils/mongoUtil");
+const { insertPreviewLink } = require("../utils/movieLinkUtil");
 // const { checkMovie, getMovie, storeMovie } = require("./redisController");
 
 const getMovies = async (req, res) => {
@@ -17,6 +18,7 @@ const getMovies = async (req, res) => {
     const movieDetails = await movies.find(_id).toArray();
     // await storeMovie(id, movieDetails);
     // console.log("From DB");
+    insertPreviewLink(movieDetails);
     res.status(200).json({ data: movieDetails });
   // }
 }
@@ -51,7 +53,10 @@ const getSimilarMovies = async (req, res) => {
             'languages':1,
             'imdb':1,
             'year':1,
-            'directors':1
+        'directors': 1,
+        'cast': 1,
+        'runtime': 1,
+        'fullplot': 1,
         
       }
     }

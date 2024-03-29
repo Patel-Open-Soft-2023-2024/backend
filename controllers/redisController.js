@@ -1,6 +1,4 @@
 // const { createClient } = require("redis");
-// require("dotenv").config({ path: "./config.env" });
-
 // const client = createClient({
 //     password: `${process.env.REDIS_CLIENT_PASSWORD}`,
 //     socket: {
