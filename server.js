@@ -1,9 +1,10 @@
-const express = require('express');
+//REQUIRED ONLY ONCE
+require('dotenv').config({ path: "./config.env" });
 const mongoUtil = require('./utils/mongoUtil');
 const cors = require('cors');
 const routes = require('./routes');
+const express = require('express');
 
-require('dotenv').config({ path: "./config.env" });
 
 const app = express()
 

@@ -21,6 +21,9 @@ const {
 const key_id = "rzp_test_J03FGVGxMcgSmP";
 const key_secret = "0fTBPksPGbrj7nWh8WSr";
 
+const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
+
+
 const createUser = async (req, res) => {
   try {
     const users = mongoUtil.getDB().collection("users");
@@ -286,6 +289,46 @@ const verifyOrder = (req, res) => {
   }
 };
 
+
+// stripe payment (2)
+
+const plans =[
+  {id:"basic" ,name: "Basic", price: "Rs 59",priceInPaise:59*100, benefits: ["Standard Definition (SD)","1 screen"]},
+  {id:"standard", name: "Standard", price: "Rs 199",priceInPaise:199*100, benefits: ["High Definition (HD)","2 screens"]},
+  {id:"premium", name: "Premium", price: "Rs 349", priceInPaise:349*100, benefits: ["Ultra High Definition (UHD)","4 screens"]},
+]
+
+// use 4000003560000008 as card number for testing
+const onSubscribe=async (req, res) => {
+  try {
+    const planID=req.query.plan;
+    //find match of plan with id in plans
+    const planMatch = plans.find((plan) => plan.id === planID);
+    if (!planMatch) throw Error("plan not found");
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      mode: "payment",
+      line_items: [
+        {
+          price_data:{
+            currency:"inr",
+            product_data:{
+              name:planMatch.id
+            },
+            unit_amount:planMatch.priceInPaise
+          },
+          quantity:1
+        }],
+      success_url: `${process.env.CLIENT_URL}/success.html`,
+      cancel_url: `${process.env.CLIENT_URL}/cancel.html`,
+    });
+    res.json({ url: session.url })
+  } catch (e) {
+    res.status(500).json({ error: e.message })
+  }
+}
+
+
 //FOR PROFILE HISTORY
 const addHistoryProfile = async (req, res) => {
     try {
@@ -523,6 +566,7 @@ module.exports = {
   googleLogin,
   createOrder,
   verifyOrder,
+  onSubscribe,
   addHistoryProfile,
   getHomeData,
   addWatchlistToProfile,

@@ -2,7 +2,7 @@ const express = require('express');
 const { getSimilarMovies,getMovies} = require('./controllers/moviesController');
 const { autoComplete, getSemanticSearch } = require('./controllers/searchController');
 const { isAuthenticated } = require('./middleware/isAuthenticated');
-const { getUsers, getUserById, updateUser, createUser, deleteUser, addMovieToWatchlist, removeMovieFromWatchlist, login, googleLogin, logout, signup, createOrder, verifyOrder,addHistoryProfile,getHomeData,addWatchlistToProfile, getMovieVideoById } = require('./controllers/userController');
+const { getUsers, getUserById, updateUser, createUser, deleteUser, addMovieToWatchlist, removeMovieFromWatchlist, login, googleLogin, logout, signup, createOrder, verifyOrder,onSubscribe,addHistoryProfile,getHomeData,addWatchlistToProfile, getMovieVideoById } = require('./controllers/userController');
 const { publishMessage } = require('./controllers/redisController');
 const { getHome,getRandom, getSection } = require('./controllers/homeController');
 const { signupWithEmailAndPassword, signinWithEmailAndPassword } = require('./controllers/firebaseAuthController');
@@ -53,6 +53,7 @@ router.get("/getmovievideo", getMovieVideoById);
 // PAYMENT ROUTES
 router.post("/payment/createOrder", createOrder);
 router.post("/payment/verifyOrder", verifyOrder);
+router.post("/subscribe",onSubscribe)
 
 router.get("/private", isAuthenticated, (req, res) => {
     res.json(req.user);

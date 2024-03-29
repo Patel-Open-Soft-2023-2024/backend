@@ -1,6 +1,4 @@
 const MongoClient = require('mongodb').MongoClient;
-require('dotenv').config({ path: "../config.env" });
-
 var mongoClient;
 
 const connectToCluster = async () => {

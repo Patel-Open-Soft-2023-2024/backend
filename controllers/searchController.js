@@ -1,4 +1,3 @@
-require("dotenv").config({ path: "../config.env" });
 const mongoUtil = require('../utils/mongoUtil')
 const {insertPreviewLink} = require('../utils/movieLinkUtil');
 
