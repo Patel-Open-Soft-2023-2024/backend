@@ -606,13 +606,40 @@ const getHomeData = async (req, res) => {
       const result6 =  results[5];
       const result7 =  results[6];
       //GET _id of first movie of history
-    if (result2.length != 0) {
+    if (result2.length != 0 && result.length != 0) {
       const movie_id = result2[0]._id;
       const movie_name = result2[0].title;
       //Get similar movies
       const similar_movies = await getSimilarMovies(movie_id);
       res.status(200).json({
         watchlist: result,
+        history: result2,
+        similar_movie: { [movie_name]: similar_movies },
+        latest_movie: result3,
+        best_imdb_movie: result4,
+        best_tomato_movie: result5,
+        best_english_movie: result6,
+        best_hindi_movie: result7,
+      });
+    }
+    else if(result.length != 0)
+    {
+      res.status(200).json({
+        watchlist: result,
+        latest_movie: result3,
+        best_imdb_movie: result4,
+        best_tomato_movie: result5,
+        best_english_movie: result6,
+        best_hindi_movie: result7,
+      });
+    }
+    else if(result2.length != 0)
+    {
+      const movie_id = result2[0]._id;
+      const movie_name = result2[0].title;
+      //Get similar movies
+      const similar_movies = await getSimilarMovies(movie_id);
+      res.status(200).json({
         history: result2,
         similar_movie: { [movie_name]: similar_movies },
         latest_movie: result3,

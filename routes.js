@@ -76,6 +76,7 @@ router.delete("/deleteuser:id", deleteUser);
 router.post("/addmovie:id", addMovieToWatchlist);
 router.post("/removemovie:id", removeMovieFromWatchlist);
 router.get("/favourites", getFavoriteMovies);
+router.post("/getmylist", getFavoriteMovies);
 // router.post("/publish", publishMessage);
 // router.post("/login", login);
 // router.post("/signup", signup);
