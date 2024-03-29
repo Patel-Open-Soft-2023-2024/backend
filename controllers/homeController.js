@@ -3,6 +3,7 @@ const mongoUtil = require("../utils/mongoUtil");
 const {insertPreviewLink} = require("../utils/movieLinkUtil");
 
 async function getMovieSection(section) {
+    console.log(section);
     const movieDB = mongoUtil.getDB().collection("embedded_movies");
     const pipeline = [
       {

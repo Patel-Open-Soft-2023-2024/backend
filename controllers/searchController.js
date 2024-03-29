@@ -1,13 +1,24 @@
 const mongoUtil = require('../utils/mongoUtil')
 const {insertPreviewLink} = require('../utils/movieLinkUtil');
 
+
+ let black = (input) => '\x1b[30m' + input + '\x1b[0m'
+ let red = (input) => '\x1b[31m' + input + '\x1b[0m'
+ let green = (input) => '\x1b[32m' + input + '\x1b[0m'
+ let yellow = (input) => '\x1b[33m' + input + '\x1b[0m'
+ let blue = (input) => '\x1b[34m' + input + '\x1b[0m'
+ let magenta = (input) => '\x1b[35m' + input + '\x1b[0m'
+ let cyan = (input) => '\x1b[36m' + input + '\x1b[0m'
+ let white = (input) => '\x1b[37m' + input + '\x1b[0m'
+ let gray = (input) => '\x1b[90m' + input + '\x1b[0m'
+
 const autoComplete = async (req, res) => {
-    console.log(req.query.movie);
     const query_name = req.query.movie;
     // remove spaces from the string
     const query_no_space = query_name.replace(/\s+/g, '');
     const movies = mongoUtil.getDB().collection("movies");
     if (req.query.autocomplete) {
+        console.log(gray("auto:"),req.query.movie);
         const autoCompletePipeline = [
             {
                 "$search": {
@@ -76,6 +87,7 @@ const autoComplete = async (req, res) => {
         }
     }
     else {
+        console.log(blue("diverse:"),req.query.movie);
         const titlePipeline = [
             {
                 "$search": {
@@ -321,6 +333,7 @@ const autoComplete = async (req, res) => {
 // }
 
 const getSemanticSearch = async (req, res) => {
+    console.log(green("semantic:"),req.query.movie);
     const movieDB = mongoUtil.getDB().collection("embedded_movies");
     const body = {
         "input": req.query.movie,
