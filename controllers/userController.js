@@ -512,6 +512,19 @@ const getWatchlistOfProfile = async (profileId) => {
   }
 };
 
+const getFavoriteMovies = async (req, res) => {
+  try{
+    const profile = req.body.profileId;
+    const result = await getWatchlistOfProfile(profile);
+    res.status(200).json(result);
+  }
+  catch(error){
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+}
+
+
 const getSimilarMovies = async (movie_id) => {
   const _id = movie_id;
   const movieDB = mongoUtil.getDB().collection("embedded_movies");
@@ -567,19 +580,28 @@ const getSimilarMovies = async (movie_id) => {
 //Getting all home page data
 const getHomeData = async (req, res) => {
   try {
-    const profile = await req.body.profileId;
+    const profile = req.body.profileId;
     console.log(
       "====================================================================",
       profile
     );
-    const result = await getWatchlistOfProfile(profile);
-    const result2 = await getProfileHistory(profile);
-    const result3 = await getLatestMovie();
-    const result4 = await getBestMovies();
-    const result5 = await getBestMovieByTomato();
-    const result6 = await getBestEnglishMovie();
-    const result7 = await getBestHindiMovie();
-    //GET _id of first movie of history
+    const results=await Promise.all([
+      getWatchlistOfProfile(profile),
+      getProfileHistory(profile),
+      getLatestMovie(),
+      getBestMovies(),
+      getBestMovieByTomato(),
+      getBestEnglishMovie(),
+      getBestHindiMovie(),
+    ]);
+      const result = results[0];
+      const result2 = results[1];
+      const result3 =  results[2];
+      const result4 =  results[3];
+      const result5 =  results[4];
+      const result6 =  results[5];
+      const result7 =  results[6];
+      //GET _id of first movie of history
     if (result2.length != 0) {
       const movie_id = result2[0]._id;
       const movie_name = result2[0].title;
@@ -596,14 +618,16 @@ const getHomeData = async (req, res) => {
         best_hindi_movie: result7,
       });
     }
-    //ADD MOVIE_NAME AS KEY TO SIMILAR MOVIES
-    res.status(200).json({
-      latest_movie: result3,
-      best_imdb_movie: result4,
-      best_tomato_movie: result5,
-      best_english_movie: result6,
-      best_hindi_movie: result7,
-    });
+    else{
+      //ADD MOVIE_NAME AS KEY TO SIMILAR MOVIES
+      res.status(200).json({
+        latest_movie: result3,
+        best_imdb_movie: result4,
+        best_tomato_movie: result5,
+        best_english_movie: result6,
+        best_hindi_movie: result7,
+      });
+    }
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal server error" });
@@ -774,4 +798,5 @@ module.exports = {
   getMovieVideoById,
   getAllProfileofaUser,
   createProfile,
+  getFavoriteMovies
 };
