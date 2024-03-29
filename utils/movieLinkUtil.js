@@ -47,7 +47,7 @@ const roadHouse = new MovieLinks(
 );
 
 const baby_driver = new MovieLinks(
-  "baby_drive/baby_driver_preview.mp4",
+  "baby_driver/baby_driver_preview.mp4",
   "baby_driver/baby_driver_1080p.m3u8",
   "baby_driver/baby_driver_720p.m3u8",
   "baby_driver/baby_driver_540p.m3u8"
