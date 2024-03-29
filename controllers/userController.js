@@ -461,6 +461,9 @@ const getBestMovieByTomato = async () => {
 const addWatchlistToProfile = async (req, res) => {
   try {
     const profile = mongoUtil.getDB().collection("Watch_list");
+    console.log(req);
+    console.log("---------------");
+    console.log(req.body.profile);
     const profileId = req.body.profile;
     const movieId = req.body.movie;
     const result = await profile.insertOne({
@@ -515,6 +518,7 @@ const getWatchlistOfProfile = async (profileId) => {
 const getFavoriteMovies = async (req, res) => {
   try{
     const profile = req.body.profileId;
+    console.log(req);
     const result = await getWatchlistOfProfile(profile);
     res.status(200).json(result);
   }
