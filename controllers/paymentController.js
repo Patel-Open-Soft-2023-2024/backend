@@ -9,8 +9,6 @@ function genSecretKey(){
     return  crypto.randomBytes(32).toString('hex');
 }
 
-
-
 // stripe payment (2)
 
 const plans =[
