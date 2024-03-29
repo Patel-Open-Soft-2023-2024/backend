@@ -66,6 +66,7 @@ const signupWithEmailAndPassword = async (req, res) => {
             message: "User logged in successfully.",
             token: response.idToken,
             uid: response.localId,
+            Subscription: newUser.Subscription,
           });
         }
       });
@@ -115,6 +116,7 @@ const signinWithEmailAndPassword = async (req, res) => {
             message: "User logged in successfully.",
             token: response.idToken,
             uid: u1.uid,
+            Subscription: u1.Subscription,
           });
         }
       });
