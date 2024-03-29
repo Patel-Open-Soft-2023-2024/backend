@@ -1,56 +1,58 @@
 const express = require("express");
 const {
-  getSimilarMovies,
-  getMovies,
+    getSimilarMovies,
+    getMovies,
 } = require("./controllers/moviesController");
 const {
-  autoComplete,
-  getSemanticSearch,
+    autoComplete,
+    getSemanticSearch,
 } = require("./controllers/searchController");
 const { isAuthenticated } = require("./middleware/isAuthenticated");
 const {
-  getUsers,
-  getUserById,
-  updateUser,
-  createUser,
-  deleteUser,
-  addMovieToWatchlist,
-  removeMovieFromWatchlist,
-  createOrder,
-  verifyOrder,
-  onSubscribe,
-  addHistoryProfile,
-  getHomeData,
-  addWatchlistToProfile,
-  getMovieVideoById,
+    getUsers,
+    getUserById,
+    updateUser,
+    createUser,
+    deleteUser,
+    addMovieToWatchlist,
+    removeMovieFromWatchlist,
+    createOrder,
+    verifyOrder,
+    onSubscribe,
+    addHistoryProfile,
+    getHomeData,
+    addWatchlistToProfile,
+    getMovieVideoById,
+    getAllProfileofaUser,
+    createProfile,
 } = require("./controllers/userController");
 const { publishMessage } = require("./controllers/redisController");
 const {
-  getHome,
-  getRandom,
-  getSection,
+    getHome,
+    getRandom,
+    getSection,
 } = require("./controllers/homeController");
 const {
-  signupWithEmailAndPassword,
-  signinWithEmailAndPassword,
+    signupWithEmailAndPassword,
+    signinWithEmailAndPassword,
 } = require("./controllers/firebaseAuthController");
 
 const router = express.Router();
 
 //-------------------------------------------------
 router.get("/", async (req, res) => {
-  res
-    .status(200)
-    .json({
-      message:
-        "Hello, this message means you have your server up and listening. GET, SET, GO!!",
-    });
+    res
+        .status(200)
+        .json({
+            message:
+                "Hello, this message means you have your server up and listening. GET, SET, GO!!",
+        });
 });
 router.post("/", async (req, res) => {
-  console.log(req.body);
-  res
-    .status(200)
-    .json({ message: "This is the body you sent.", body: req.body });
+    console.log(req.body);
+    res
+        .status(200)
+        .json({ message: "This is the body you sent.", body: req.body });
 });
 //------------------------------------------------
 
@@ -92,6 +94,6 @@ router.post("/payment/verifyOrder", verifyOrder);
 router.post("/subscribe", onSubscribe);
 
 router.get("/private", isAuthenticated, (req, res) => {
-  res.json(req.user);
+    res.json(req.user);
 });
 module.exports = router;
