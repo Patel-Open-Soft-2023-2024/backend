@@ -2,7 +2,7 @@ const { ObjectId } = require("mongodb");
 const mongoUtil = require("../utils/mongoUtil");
 const {insertPreviewLink} = require("../utils/movieLinkUtil");
 const { getWatchlistOfProfile, getProfileHistory } = require("./userController");
-const { getLatestMovie, getBestMovies, getBestMovieByTomato, getBestEnglishMovie, getBestHindiMovie, getSimilarMovies } = require("./moviesController");
+const { getLatestMovie, getBestMovies, getBestMovieByTomato, getBestEnglishMovie, getBestHindiMovie, getSimilarMovies, getSimilarMoviesForApp } = require("./moviesController");
 
 async function getMovieSection(section) {
     console.log(section);
@@ -142,4 +142,62 @@ const getHomeData = async (req, res) => {
   }
 };
 
-module.exports = { getHome,getRandom, getSection, getHomeData }
+
+//Getting all home page data
+const getHomeDataForApp = async (req, res) => {
+  try {
+    const profile = req.body.profileId;
+    console.log(
+      "====================================================================",
+      profile
+    );
+    const results=await Promise.all([
+      getWatchlistOfProfile(profile),
+      getProfileHistory(profile),
+      getLatestMovie(),
+      getBestMovies(),
+      getBestMovieByTomato(),
+      getBestEnglishMovie(),
+      getBestHindiMovie(),
+    ]);
+      const result = results[0];
+      const result2 = results[1];
+      const result3 =  results[2];
+      const result4 =  results[3];
+      const result5 =  results[4];
+      const result6 =  results[5];
+      const result7 =  results[6];
+      //GET _id of first movie of history
+    if (result2.length != 0) {
+      const movie_id = result2[0]._id;
+      const movie_name = result2[0].title;
+      //Get similar movies
+      const similar_movies = await getSimilarMoviesForApp(movie_id);
+      res.status(200).json({
+        watchlist: result,
+        history: result2,
+        similar_movie: { [movie_name]: similar_movies },
+        latest_movie: result3,
+        best_imdb_movie: result4,
+        best_tomato_movie: result5,
+        best_english_movie: result6,
+        best_hindi_movie: result7,
+      });
+    }
+    else{
+      //ADD MOVIE_NAME AS KEY TO SIMILAR MOVIES
+      res.status(200).json({
+        latest_movie: result3,
+        best_imdb_movie: result4,
+        best_tomato_movie: result5,
+        best_english_movie: result6,
+        best_hindi_movie: result7,
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+module.exports = { getHome,getRandom, getSection, getHomeData, getHomeDataForApp }

@@ -84,6 +84,77 @@ const getSimilarMovies = async (req, res) => {
     console.log(error);
   }
 }
+
+const getSimilarMoviesForApp = async (_id) => {
+  const movieDB = mongoUtil.getDB().collection("movies");
+  const embed_movieDB = mongoUtil.getDB().collection("embedded_movies");
+  const movie_plot = await movieDB.find({ _id }).project({ "fullplot": 1, "_id": 0 }).toArray();
+  console.log(movie_plot);
+  const body = {
+    input: movie_plot[0].fullplot,
+    model: "text-embedding-ada-002",
+  };
+  try {
+    const data = await fetch("https://api.openai.com/v1/embeddings", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.OPEN_API_SECRET}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then(async (response) => {
+        // console.log(response);
+        const embeddings = response.data[0].embedding;
+        // console.log(embeddings);
+
+        const pipeline = [
+          {
+            '$vectorSearch': {
+              'index': 'vector_inde',
+              'path': 'plot_embedding',
+              'queryVector': embeddings,
+              'numCandidates': 150,
+              'limit': 10
+            }
+          }, {
+            '$project': {
+              '_id': 1,
+              'plot': 1,
+              'title': 1,
+              'score': {
+                '$meta': 'vectorSearchScore'
+              },
+              'genres': 1,
+              'poster': 1,
+              'languages': 1,
+              'imdb': 1,
+              'year': 1,
+              'directors': 1,
+              'cast': 1,
+              'runtime': 1,
+              'fullplot': 1,
+            }
+          }
+        ];
+        const result = await embed_movieDB.aggregate(pipeline).toArray();
+        console.log(result);
+        const string_id = _id.toString();
+        // remove the movie with the same id
+        const filteredResult = result.filter((movie) => {
+          return movie._id.toString() !== string_id;
+        });
+        return filteredResult;
+      })
+      return data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 //ADD MOVIE TO USER'S WATCHLIST
 const addMovieToWatchlist = async (req, res) => {
   try {
@@ -392,4 +463,4 @@ const getFavoriteMovies = async (req, res) => {
   }
 }
 
-module.exports = { getSimilarMovies, getMovies, addMovieToWatchlist, removeMovieFromWatchlist, getLatestMovie, getBestEnglishMovie, getBestMovieByTomato, getBestMovies, getBestHindiMovie, getMoviesByGenres, getMovieVideoById, getFavoriteMovies }
+module.exports = { getSimilarMovies, getMovies, getSimilarMoviesForApp, addMovieToWatchlist, removeMovieFromWatchlist, getLatestMovie, getBestEnglishMovie, getBestMovieByTomato, getBestMovies, getBestHindiMovie, getMoviesByGenres, getMovieVideoById, getFavoriteMovies }

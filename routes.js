@@ -1,5 +1,5 @@
 const express = require("express");
-const { getHome, getRandom, getSection, getHomeData } = require("./controllers/homeController");
+const { getHome, getRandom, getSection, getHomeData, getHomeDataForApp } = require("./controllers/homeController");
 const { getMovies, getSimilarMovies, addMovieToWatchlist, removeMovieFromWatchlist, getFavoriteMovies, getMovieVideoById } = require("./controllers/moviesController");
 const { autoComplete, getSemanticSearch } = require("./controllers/searchController");
 const { getUsers, getUserById, updateUser, createUser, deleteUser, addWatchlistToProfile, addHistoryProfile, getAllProfileofaUser, createProfile, onSubscribe } = require("./controllers/userController");
@@ -53,6 +53,7 @@ router.post("/login", signinWithEmailAndPassword);
 
 router.post("/addwatchlist", addWatchlistToProfile);
 router.post("/homedata", getHomeData);
+router.post("/homedataforapp", getHomeDataForApp);
 router.post("/addhistory", addHistoryProfile);
 router.get("/getmovievideo", getMovieVideoById);
 router.post("/getallprofile", getAllProfileofaUser);
