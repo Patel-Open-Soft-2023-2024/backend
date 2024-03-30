@@ -316,4 +316,4 @@ const createProfile = async (req, res) => {
 };
 
 //EXPORTING ALL FUNCTIONS
-module.exports = { createUser, getUsers, getUserById, updateUser, deleteUser, onSubscribe, addHistoryProfile, addWatchlistToProfile, getAllProfileofaUser, createProfile };
+module.exports = { createUser, getUsers, getUserById, updateUser, getWatchlistOfProfile, getProfileHistory, hexToDecimalUsingMap, deleteUser, onSubscribe, addHistoryProfile, addWatchlistToProfile, getAllProfileofaUser, createProfile };
