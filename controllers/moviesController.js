@@ -67,7 +67,6 @@ const getSimilarMovies = async (req, res) => {
               'cast': 1,
               'runtime': 1,
               'fullplot': 1,
-
             }
           }
         ];
@@ -78,6 +77,7 @@ const getSimilarMovies = async (req, res) => {
         const filteredResult = result.filter((movie) => {
           return movie._id.toString() !== string_id;
         });
+        insertPreviewLink(filteredResult);
         res.status(200).json(filteredResult);
       })
   } catch (error) {
