@@ -3,9 +3,9 @@ const { getHome, getRandom, getSection, getHomeData, getHomeDataForApp } = requi
 const { getFullVideoLink, getMovies, getSimilarMovies, addMovieToWatchlist, removeMovieFromWatchlist, getFavoriteMovies, getMovieVideoById } = require("./controllers/moviesController");
 const { autoComplete, getSemanticSearch } = require("./controllers/searchController");
 const { getUsers, getUserById, updateUser, createUser, deleteUser, addWatchlistToProfile, addHistoryProfile, getAllProfileofaUser, createProfile } = require("./controllers/userController");
-const { signupWithEmailAndPassword, signinWithEmailAndPassword ,registerFromNEXTJS} = require("./controllers/firebaseAuthController");
+const { signupWithEmailAndPassword, signinWithEmailAndPassword, registerFromNEXTJS } = require("./controllers/firebaseAuthController");
 const { onSubscribe, redeemSubscription } = require("./controllers/paymentController");
-const { isAuthenticated } = require("./middleware/isAuthenticated");
+const { isAuthenticated, test } = require("./middleware/isAuthenticated");
 
 // const { onSubscribe, redeemSubscription } = require('./controllers/paymentController');
 const router = express.Router();
@@ -70,13 +70,11 @@ router.post("/redeem", redeemSubscription);
 
 //MOVIE LINK
 router.post("/getlink", isAuthenticated, getFullVideoLink);
-router.post('/register/nextjs',registerFromNEXTJS);
-router.post("/favourites/next", isAuthenticated,getFavoriteMovies);
-router.post("/getallprofile/next",isAuthenticated, getAllProfileofaUser);
+router.post('/register/nextjs', registerFromNEXTJS);
+router.post("/favourites/next", isAuthenticated, getFavoriteMovies);
+router.post("/getallprofile/next", isAuthenticated, getAllProfileofaUser);
 
 
-router.get("/private", isAuthenticated, (req, res) => {
-  res.json(req.user);
-});
+router.get("/private", isAuthenticated, test);
 
 module.exports = router;

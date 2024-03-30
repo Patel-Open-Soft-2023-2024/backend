@@ -150,7 +150,7 @@ const getSimilarMoviesForApp = async (_id) => {
         });
         return filteredResult;
       })
-      return data;
+    return data;
   } catch (error) {
     console.log(error);
   }
@@ -454,7 +454,7 @@ const getFavoriteMovies = async (req, res) => {
   try {
     const profile = req.body.profileId;
     const result = await getWatchlistOfProfile(profile);
-    console.log("Getting favourites/watchlist for profile:",profile);
+    console.log("Getting favourites/watchlist for profile:", profile);
     res.status(200).json(result);
   }
   catch (error) {
@@ -465,17 +465,45 @@ const getFavoriteMovies = async (req, res) => {
 
 const getFullVideoLink = async (req, res) => {
   try {
-    if(!req.body.movieId){
+    if (!req.body.movieId) {
       res.status(400).json({ error: "Movie id not provided" });
       return;
     }
     const movie_id = req.body.movieId;
-    const subscription = req.user.Subscription;
-    
-    if(subscription=='None'){
-      res.status(403).json({ error: "You don't have a subscription" }); 
+    if (!req.user) {
+      res.status(403).json({ error: "Unauthorized" });
       return;
     }
+    const subscription = req.user.Subscription;
+
+    if (subscription == 'None') {
+      res.status(403).json({ error: "You don't have a subscription" });
+      return;
+    }
+    const history = mongoUtil.getDB().collection("History");
+    const profileId = req.body.profile;
+    console.log({profileId})
+    // const result = await profile.insertOne({
+    //   _id: new ObjectId(),
+    //   Profile_id: profileId,
+    //   Movie_id: movie_id,
+    // });
+    const result = await history.updateOne(
+      {
+        Movie_id: movie_id,
+        Profile_id: profileId,
+      },
+      {
+        $set: {
+          Movie_id: movie_id,
+          Profile_id: profileId,
+        }
+      },
+      {
+        upsert: true
+      }
+    );
+    console.log("added to history", result);
     const movie = getLink(movie_id, subscription);
     res.status(200).json({ video: movie });
   } catch (error) {

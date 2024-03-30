@@ -87,7 +87,7 @@ const getLink = (movieId, subscription) => {
   const decimalRepresentation = BigInt("0x" + movieId);
   const hashValue = Number(decimalRepresentation % BigInt(rangeMax));
   // const tier=req.user.subscription;//TODO: email -> user -> tier  [Done --> need Testing]
-  return movieLinksList[hashValue].getLinkBySubscription(subscription);  
+  return movieLinksList[hashValue].getLinkBySubscription(subscription);
 };
 
 module.exports = { insertPreviewLink, getLink };

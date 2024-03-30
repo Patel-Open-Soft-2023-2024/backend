@@ -148,16 +148,31 @@ const getProfileHistory = async (profileId) => {
 // ADDING WATCHLIST TO PROFILE
 const addWatchlistToProfile = async (req, res) => {
   try {
-    const profile = mongoUtil.getDB().collection("Watch_list");
+    const watchlist = mongoUtil.getDB().collection("Watch_list");
     console.log("---------------");
     console.log(req.body.profile);
     const profileId = req.body.profile;
     const movieId = req.body.movie;
-    const result = await profile.insertOne({
-      _id: new ObjectId(),
-      Profile_id: profileId,
-      Movie_id: movieId,
-    });
+    // const result = await profile.insertOne({
+    //   _id: new ObjectId(),
+    //   Profile_id: profileId,
+    //   Movie_id: movieId,
+    // });
+    const result = await watchlist.updateOne(
+      {
+        Movie_id: movie_id,
+        Profile_id: profileId,
+      },
+      {
+        $set: {
+          Movie_id: movie_id,
+          Profile_id: profileId,
+        }
+      },
+      {
+        upsert: true
+      }
+    );
     res
       .status(200)
       .json({ message: "Watchlist added to profile successfully" });
@@ -227,12 +242,12 @@ const getAllProfileofaUser = async (req, res) => {
     console.log(idToken);
 
     var u_id;
-    if(!req.user){
+    if (!req.user) {
       const user = mongoUtil.getDB().collection("User");
       const r1 = await user.find({ uid: idToken }).toArray();
       u_id = r1[0]._id;
     }
-    else{
+    else {
       u_id = req.user._id;
     }
     const profile = mongoUtil.getDB().collection("Profile");
