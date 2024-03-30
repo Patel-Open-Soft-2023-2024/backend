@@ -7,6 +7,15 @@ const isAuthenticated = async (req, res, next) => {
     }
     const token = authToken.split(' ')[1];
 
+    if(token.startsWith('NEXTJS')){
+        //get email from request
+        const email = req.body.email;
+        if(!email){
+            return res.status(401).json({ "error": "Unauthorized", "message": "Provide email in body" });
+        }
+        req.nextJS = email;
+        return next();
+    }
     admin
         .auth()
         .verifyIdToken(token)

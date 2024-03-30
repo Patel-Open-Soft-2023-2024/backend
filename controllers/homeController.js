@@ -1,6 +1,8 @@
 const { ObjectId } = require("mongodb");
 const mongoUtil = require("../utils/mongoUtil");
 const {insertPreviewLink} = require("../utils/movieLinkUtil");
+const { getWatchlistOfProfile, getProfileHistory } = require("./userController");
+const { getLatestMovie, getBestMovies, getBestMovieByTomato, getBestEnglishMovie, getBestHindiMovie, getSimilarMovies } = require("./moviesController");
 
 async function getMovieSection(section) {
     console.log(section);

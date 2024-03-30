@@ -47,7 +47,7 @@ const roadHouse = new MovieLinks(
 );
 
 const baby_driver = new MovieLinks(
-  "baby_drive/baby_driver_preview.mp4",
+  "baby_driver/baby_driver_preview.mp4",
   "baby_driver/baby_driver_1080p.m3u8",
   "baby_driver/baby_driver_720p.m3u8",
   "baby_driver/baby_driver_540p.m3u8"
@@ -84,14 +84,11 @@ function insertPreviewLink(movieList) {
 const getLink = async (req, res) => {
 
   try {
-    // const isNextServer = 
-    const objectId = req.params.id;
-    const decimalRepresentation = BigInt("0x" + objectId);
+    const email = req.body.email;
+    const decimalRepresentation = BigInt("0x" + req.body.movieId);
     const hashValue = Number(decimalRepresentation % BigInt(rangeMax));
-
-    res
-      .status(200)
-      .json(movieLinksList[hashValue].getLinkBySubscription("premium"));
+    const tier="premium";//TODO: email -> user -> tier
+    res.status(200).json(movieLinksList[hashValue].getLinkBySubscription(tier));  
   } catch (error) {
     console.error(error);
   }
