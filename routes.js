@@ -1,11 +1,10 @@
 const express = require("express");
 const { getHome, getRandom, getSection, getHomeData, getHomeDataForApp } = require("./controllers/homeController");
-const { getMovies, getSimilarMovies, addMovieToWatchlist, removeMovieFromWatchlist, getFavoriteMovies, getMovieVideoById } = require("./controllers/moviesController");
+const { getFullVideoLink, getMovies, getSimilarMovies, addMovieToWatchlist, removeMovieFromWatchlist, getFavoriteMovies, getMovieVideoById } = require("./controllers/moviesController");
 const { autoComplete, getSemanticSearch } = require("./controllers/searchController");
-const { getUsers, getUserById, updateUser, createUser, deleteUser, addWatchlistToProfile, addHistoryProfile, getAllProfileofaUser, createProfile, onSubscribe } = require("./controllers/userController");
+const { getUsers, getUserById, updateUser, createUser, deleteUser, addWatchlistToProfile, addHistoryProfile, getAllProfileofaUser, createProfile } = require("./controllers/userController");
 const { signupWithEmailAndPassword, signinWithEmailAndPassword ,registerFromNEXTJS} = require("./controllers/firebaseAuthController");
-const { getLink } = require("./utils/movieLinkUtil");
-const { redeemSubscription } = require("./controllers/paymentController");
+const { onSubscribe, redeemSubscription } = require("./controllers/paymentController");
 const { isAuthenticated } = require("./middleware/isAuthenticated");
 
 // const { onSubscribe, redeemSubscription } = require('./controllers/paymentController');
@@ -26,12 +25,11 @@ router.post("/", async (req, res) => {
 });
 //------------------------------------------------
 
-router.get("/home", getHome);
-router.get("/random", getRandom);
-router.get("/section/:name", getSection);
-router.get("/movie/:id", getMovies);
+// SEARCH ROUTES
 router.get("/search", autoComplete);
 router.get("/search/semantic", getSemanticSearch);
+
+router.get("/movie/:id", getMovies);
 router.get("/movie/similar/:id", getSimilarMovies);
 // router.post("/moresearch", getMoreResults);
 
@@ -50,23 +48,32 @@ router.post("/getmylist", getFavoriteMovies);
 router.post("/signup", signupWithEmailAndPassword);
 router.post("/login", signinWithEmailAndPassword);
 
-router.post("/addwatchlist", addWatchlistToProfile);
-router.post("/homedata", getHomeData);
+router.post("/addwatchlist", addWatchlistToProfile);  // input-> profile: , movie: ,
 router.post("/homedataforapp", getHomeDataForApp);
 router.post("/addhistory", addHistoryProfile);
 router.get("/getmovievideo", getMovieVideoById);
 router.post("/getallprofile", getAllProfileofaUser);
 router.post("/createprofile", createProfile);
+
+
+//        **** WEBSITE SPECIFIC ROUTES ****      //
+
+// HOME PAGE
+router.post("/homedata", getHomeData);
+router.get("/home", getHome);
+router.get("/random", getRandom);
+router.get("/section/:name", getSection);
+
 // PAYMENT ROUTES
-// router.post("/payment/createOrder", createOrder);
-// router.post("/payment/verifyOrder", verifyOrder);
-router.post("/subscribe", onSubscribe);
+router.post("/subscribe", isAuthenticated, onSubscribe);
+router.post("/redeem", redeemSubscription);
 
 //MOVIE LINK
-router.post("/getlink", isAuthenticated,getLink);
-router.post("/redeem", redeemSubscription);
+router.post("/getlink", isAuthenticated, getFullVideoLink);
 router.post('/register/nextjs',registerFromNEXTJS);
 router.post("/favourites/next", isAuthenticated,getFavoriteMovies);
+router.post("/getallprofile/next",isAuthenticated, getAllProfileofaUser);
+
 
 router.get("/private", isAuthenticated, (req, res) => {
   res.json(req.user);

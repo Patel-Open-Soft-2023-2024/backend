@@ -26,7 +26,7 @@ const createUser = async (req, res) => {
 
 const getUsers = async (req, res) => {
   try {
-    const users = mongoUtil.getDB().collection("Profile");
+    const users = mongoUtil.getDB().collection("User");
     const result = await users.find().toArray();
     res.status(200).json(result);
   } catch (error) {
@@ -90,62 +90,6 @@ const deleteUser = async (req, res) => {
   }
 };
 
-// stripe payment (2)
-
-const plans = [
-  {
-    id: "basic",
-    name: "Basic",
-    price: "Rs 59",
-    priceInPaise: 59 * 100,
-    benefits: ["Standard Definition (SD)", "1 screen"],
-  },
-  {
-    id: "standard",
-    name: "Standard",
-    price: "Rs 199",
-    priceInPaise: 199 * 100,
-    benefits: ["High Definition (HD)", "2 screens"],
-  },
-  {
-    id: "premium",
-    name: "Premium",
-    price: "Rs 349",
-    priceInPaise: 349 * 100,
-    benefits: ["Ultra High Definition (UHD)", "4 screens"],
-  },
-];
-
-// use 4000003560000008 as card number for testing
-const onSubscribe = async (req, res) => {
-  try {
-    const planID = req.query.plan;
-    //find match of plan with id in plans
-    const planMatch = plans.find((plan) => plan.id === planID);
-    if (!planMatch) throw Error("plan not found");
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      mode: "payment",
-      line_items: [
-        {
-          price_data: {
-            currency: "inr",
-            product_data: {
-              name: planMatch.id,
-            },
-            unit_amount: planMatch.priceInPaise,
-          },
-          quantity: 1,
-        },
-      ],
-      success_url: `${process.env.CLIENT_URL}/success.html`,
-      cancel_url: `${process.env.CLIENT_URL}/cancel.html`,
-    });
-    res.json({ url: session.url });
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
-};
 
 //FOR PROFILE HISTORY
 const addHistoryProfile = async (req, res) => {
@@ -205,7 +149,6 @@ const getProfileHistory = async (profileId) => {
 const addWatchlistToProfile = async (req, res) => {
   try {
     const profile = mongoUtil.getDB().collection("Watch_list");
-    console.log(req);
     console.log("---------------");
     console.log(req.body.profile);
     const profileId = req.body.profile;
@@ -282,9 +225,16 @@ const getAllProfileofaUser = async (req, res) => {
   try {
     const idToken = req.body.uid;
     console.log(idToken);
-    const user = mongoUtil.getDB().collection("User");
-    const r1 = await user.find({ uid: idToken }).toArray();
-    const u_id = r1[0]._id;
+
+    var u_id;
+    if(!req.user){
+      const user = mongoUtil.getDB().collection("User");
+      const r1 = await user.find({ uid: idToken }).toArray();
+      u_id = r1[0]._id;
+    }
+    else{
+      u_id = req.user._id;
+    }
     const profile = mongoUtil.getDB().collection("Profile");
     const r2 = await profile.find({ uid: u_id }).toArray();
     res.status(200).json(r2);
@@ -316,4 +266,4 @@ const createProfile = async (req, res) => {
 };
 
 //EXPORTING ALL FUNCTIONS
-module.exports = { createUser, getUsers, getUserById, updateUser, getWatchlistOfProfile, getProfileHistory, hexToDecimalUsingMap, deleteUser, onSubscribe, addHistoryProfile, addWatchlistToProfile, getAllProfileofaUser, createProfile };
+module.exports = { createUser, getUsers, getUserById, updateUser, getWatchlistOfProfile, getProfileHistory, hexToDecimalUsingMap, deleteUser, addHistoryProfile, addWatchlistToProfile, getAllProfileofaUser, createProfile };

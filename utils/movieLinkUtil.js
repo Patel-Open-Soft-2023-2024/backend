@@ -81,17 +81,13 @@ function insertPreviewLink(movieList) {
   });
 }
 
-const getLink = async (req, res) => {
 
-  try {
-    const decimalRepresentation = BigInt("0x" + req.body.movieId);
-    const hashValue = Number(decimalRepresentation % BigInt(rangeMax));
-    const user=req.user;
-    console.log({user});
-    const tier="premium";//TODO: email -> user -> tier
-    res.status(200).json(movieLinksList[hashValue].getLinkBySubscription(tier));  
-  } catch (error) {
-    console.error(error);
-  }
+const getLink = (movieId, subscription) => {
+  console.log("Getting Link for: ", movieId, subscription)
+  const decimalRepresentation = BigInt("0x" + movieId);
+  const hashValue = Number(decimalRepresentation % BigInt(rangeMax));
+  // const tier=req.user.subscription;//TODO: email -> user -> tier  [Done --> need Testing]
+  return movieLinksList[hashValue].getLinkBySubscription(subscription);  
 };
+
 module.exports = { insertPreviewLink, getLink };

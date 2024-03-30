@@ -14,7 +14,8 @@ let gray = (input) => "\x1b[90m" + input + "\x1b[0m";
 const autoComplete = async (req, res) => {
   const query_name = req.query.movie;
   // hard coded user id
-  const userId = "6602c074a767bf239e5b70f9";
+  const profileId = "6602c074a767bf239e5b70f9";
+
   // remove spaces from the string
   const query_no_space = query_name.replace(/\s+/g, "");
   const movies = mongoUtil.getDB().collection("movies");
@@ -329,7 +330,7 @@ const autoComplete = async (req, res) => {
         movies.aggregate(directorPipeline).toArray(),
         movies.aggregate(castPipeline).toArray(),
         movies.aggregate(genresPipeline).toArray(),
-        History.find({ Profile_id: userId }).toArray(),
+        History.find({ Profile_id: profileId }).toArray(),
       ]).then((result) => {
         const userHistoryMovieIDs = result[4].map((movie) =>
           movie.Movie_id.toString()

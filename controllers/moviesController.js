@@ -1,6 +1,6 @@
 const { ObjectId } = require("mongodb");
 const mongoUtil = require("../utils/mongoUtil");
-const { insertPreviewLink } = require("../utils/movieLinkUtil");
+const { insertPreviewLink, getLink } = require("../utils/movieLinkUtil");
 const { getWatchlistOfProfile } = require("./userController");
 // const { checkMovie, getMovie, storeMovie } = require("./redisController");
 
@@ -452,9 +452,9 @@ const getMovieVideoById = async (req, res) => {
 
 const getFavoriteMovies = async (req, res) => {
   try {
-    console.log("fav" ,res.user);
     const profile = req.body.profileId;
     const result = await getWatchlistOfProfile(profile);
+    console.log("Getting favourites/watchlist for profile:",profile);
     res.status(200).json(result);
   }
   catch (error) {
@@ -463,4 +463,25 @@ const getFavoriteMovies = async (req, res) => {
   }
 }
 
-module.exports = { getSimilarMovies, getMovies, getSimilarMoviesForApp, addMovieToWatchlist, removeMovieFromWatchlist, getLatestMovie, getBestEnglishMovie, getBestMovieByTomato, getBestMovies, getBestHindiMovie, getMoviesByGenres, getMovieVideoById, getFavoriteMovies }
+const getFullVideoLink = async (req, res) => {
+  try {
+    if(!req.body.movieId){
+      res.status(400).json({ error: "Movie id not provided" });
+      return;
+    }
+    const movie_id = req.body.movieId;
+    const subscription = req.user.Subscription;
+    
+    if(subscription=='None'){
+      res.status(403).json({ error: "You don't have a subscription" }); 
+      return;
+    }
+    const movie = getLink(movie_id, subscription);
+    res.status(200).json({ video: movie });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+}
+
+module.exports = { getFullVideoLink, getSimilarMovies, getMovies, getSimilarMoviesForApp, addMovieToWatchlist, removeMovieFromWatchlist, getLatestMovie, getBestEnglishMovie, getBestMovieByTomato, getBestMovies, getBestHindiMovie, getMoviesByGenres, getMovieVideoById, getFavoriteMovies }

@@ -19,9 +19,11 @@ const isAuthenticated = async (req, res, next) => {
         if(!email){
             return res.status(401).json({ "error": "Unauthorized", "message": "Provide email in body" });
         }
-        const user=await mongoUtil.getDB().collection("users").findOne({ email });
-        res.user=user;
-        return next();
+        const user=await mongoUtil.getDB().collection("User").findOne({ Email: email });
+        req.user=user;
+        console.log("NextJS found use:", user, req.user)
+        next();
+        return;
     }
     admin
         .auth()

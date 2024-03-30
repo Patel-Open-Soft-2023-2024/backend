@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
+const mongoUtil = require("../utils/mongoUtil");
 
 const pendingTransactions = {};
 
@@ -19,6 +20,7 @@ const plans =[
 
 // use 4000003560000008 as card number for testing
 const onSubscribe = async (req, res) => {
+    console.log("onSubscribe/ -->", req.query);
     try {
         const planID=req.query.plan;
         //find match of plan with id in plans
@@ -26,7 +28,7 @@ const onSubscribe = async (req, res) => {
         if (!planMatch) throw Error("plan not found");
 
         const transactionSecretKey = genSecretKey();
-        pendingTransactions[transactionSecretKey] = planMatch.id;
+        pendingTransactions[transactionSecretKey] = {"plan": planMatch.id, "user_id": req.user._id};
 
         const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
@@ -56,22 +58,26 @@ const onSubscribe = async (req, res) => {
 
 
 const redeemSubscription = async (req, res) => {
+    // console.log("pending: ", pendingTransactions);
     try {
         const { redeemKey } = req.body;
-        const planID = pendingTransactions[redeemKey];
-        if (!planID)
+        if (!pendingTransactions[redeemKey])
             res.status(200).json({ msg: "Transaction Key not found or invalid!" });
         else{  
             // SUCCESS
+            const planID = pendingTransactions[redeemKey]["plan"];
+            const user_id = pendingTransactions[redeemKey]["user_id"];
             delete pendingTransactions[redeemKey];
-            console.log("Transaction successful for plan", planID);
+            console.log("**** Transaction successful for plan: " + planID + " and user: "+ user_id);
 
             // update subscription in user collection
             user=mongoUtil.getDB().collection("User");
-            user.updateOne({uid:req.param.uid},{$set:{subscription:planID}});
+            const foo = await user.updateOne({_id:user_id},{$set:{Subscription:planID}});
+
+            console.log("Status: ",foo);
 
 
-            res.status(200).json({ msg: "Transaction successful for plan "+ planID });
+            res.status(200).json({ msg: "Transaction successful for plan:"+  planID + " and user: "+ user_id });
 
         }
     } catch (e) {
