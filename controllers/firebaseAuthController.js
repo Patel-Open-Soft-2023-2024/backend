@@ -49,25 +49,24 @@ const signupWithEmailAndPassword = async (req, res) => {
               uid: result.insertedId,
               Profile_name: req.body.name,
             };
-            const default_profile = await mongoUtil
+            const added_profile = await mongoUtil
               .getDB()
               .collection("Profile")
               .insertOne(newProfile);
+              //CREATE A DEFAULT PROFILE
+              res.status(200).json({
+                status: "success",
+                message: "User logged in successfully.",
+                token: response.idToken,
+                uid: response.localId,
+                Subscription: newUser.Subscription,
+              });
           } catch (error) {
             console.log(error);
             res
               .status(401)
               .json({ message: "Cannot Create Data.", error: error });
           }
-          //CREATE A DEFAULT PROFILE
-
-          res.status(200).json({
-            status: "success",
-            message: "User logged in successfully.",
-            token: response.idToken,
-            uid: response.localId,
-            Subscription: newUser.Subscription,
-          });
         }
       });
   } catch (error) {
@@ -128,4 +127,45 @@ const signinWithEmailAndPassword = async (req, res) => {
   }
 };
 
-module.exports = { signupWithEmailAndPassword, signinWithEmailAndPassword };
+const registerFromNEXTJS=async (req,res)=>{
+    //CREATE A USER DATABASE AND STORE THE USER DETAILS AND TOKEN
+    try {
+      console.log("registerFromNEXTJS");
+      // console.log(response);
+      const newUser = {
+        _id: new ObjectId(),
+        uid: "NEXTJS",
+        Name: req.body.name,
+        Email: req.body.email,
+        Subscription: "None",
+      };
+      const result = await mongoUtil
+        .getDB()
+        .collection("User")
+        .insertOne(newUser);
+
+      console.log("nextjs inserted",result.insertedId);
+      const newProfile = {
+        _id: new ObjectId(),
+        uid: result.insertedId,
+        Profile_name: req.body.name,
+      };
+      const added_profile = await mongoUtil
+        .getDB()
+        .collection("Profile")
+        .insertOne(newProfile);
+        //CREATE A DEFAULT PROFILE
+        res.status(200).json({
+          status: "success",
+          message: "User logged in successfully.",
+          Subscription: newUser.Subscription,
+        });
+    } catch (error) {
+      console.log(error);
+      res
+        .status(401)
+        .json({ message: "Cannot Create Data.", error: error });
+  }
+}
+
+module.exports = { signupWithEmailAndPassword, signinWithEmailAndPassword,registerFromNEXTJS };

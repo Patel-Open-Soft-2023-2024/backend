@@ -5,6 +5,7 @@ const { ObjectId } = require("mongodb");
 
 
 const isAuthenticated = async (req, res, next) => {
+    console.log("isAuthenticated",req.body);
     const authToken = req.headers.authorization;
     if (!authToken) {
         return res.status(401).json({ "error": "Unauthorized", "message": "Provide authorization headers" });
@@ -14,6 +15,7 @@ const isAuthenticated = async (req, res, next) => {
     if(token.startsWith('NEXTJS')){
         //get email from request
         const email = req.body.email;
+        console.log("NXTJS",{email});
         if(!email){
             return res.status(401).json({ "error": "Unauthorized", "message": "Provide email in body" });
         }

@@ -87,7 +87,7 @@ const getLink = async (req, res) => {
     const decimalRepresentation = BigInt("0x" + req.body.movieId);
     const hashValue = Number(decimalRepresentation % BigInt(rangeMax));
     const user=req.user;
-    console.log(user);
+    console.log({user});
     const tier="premium";//TODO: email -> user -> tier
     res.status(200).json(movieLinksList[hashValue].getLinkBySubscription(tier));  
   } catch (error) {

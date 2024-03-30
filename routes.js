@@ -3,7 +3,7 @@ const { getHome, getRandom, getSection, getHomeData, getHomeDataForApp } = requi
 const { getMovies, getSimilarMovies, addMovieToWatchlist, removeMovieFromWatchlist, getFavoriteMovies, getMovieVideoById } = require("./controllers/moviesController");
 const { autoComplete, getSemanticSearch } = require("./controllers/searchController");
 const { getUsers, getUserById, updateUser, createUser, deleteUser, addWatchlistToProfile, addHistoryProfile, getAllProfileofaUser, createProfile, onSubscribe } = require("./controllers/userController");
-const { signupWithEmailAndPassword, signinWithEmailAndPassword } = require("./controllers/firebaseAuthController");
+const { signupWithEmailAndPassword, signinWithEmailAndPassword ,registerFromNEXTJS} = require("./controllers/firebaseAuthController");
 const { getLink } = require("./utils/movieLinkUtil");
 const { redeemSubscription } = require("./controllers/paymentController");
 const { isAuthenticated } = require("./middleware/isAuthenticated");
@@ -43,7 +43,6 @@ router.post("/createuser", createUser);
 router.delete("/deleteuser:id", deleteUser);
 router.post("/addmovie:id", addMovieToWatchlist);
 router.post("/removemovie:id", removeMovieFromWatchlist);
-router.get("/favourites", isAuthenticated,getFavoriteMovies);
 router.post("/getmylist", getFavoriteMovies);
 // router.post("/publish", publishMessage);
 // router.post("/login", login);
@@ -66,6 +65,8 @@ router.post("/subscribe", onSubscribe);
 //MOVIE LINK
 router.post("/getlink", isAuthenticated,getLink);
 router.post("/redeem", redeemSubscription);
+router.post('/register/nextjs',registerFromNEXTJS);
+router.post("/favourites/next", isAuthenticated,getFavoriteMovies);
 
 router.get("/private", isAuthenticated, (req, res) => {
   res.json(req.user);
