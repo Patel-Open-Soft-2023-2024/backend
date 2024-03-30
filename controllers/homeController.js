@@ -34,16 +34,7 @@ async function getMovieSection(section) {
     return result;
 }
 
-const getSection = async (req, res) => {
-  const section = req.params.name;
-  const movies = await getMovieSection(section);
-  res.status(200).json(movies);
-}
 
-const getHome = async (req, res) => {
-  const sections = ["Trending", "Top Rated", "Action", "Romance", "Comedy"];
-  res.status(200).json(sections);
-}
 
 const getRandom = async (req, res) => {
 
@@ -199,5 +190,130 @@ const getHomeDataForApp = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+
+const getMoviesBasedOnGenre = async (genre) => {
+  const genresPipeline = [
+    {
+      $search: {
+        index: "default",
+        compound: {
+          should: [
+            {
+              equals: {
+                path: "genres",
+                value: `${genre}`,
+                score: { boost: { value: 5 } },
+              },
+            },
+            {
+              phrase: {
+                query: `${genre}`,
+                path: "genres",
+                score: { boost: { value: 5 } },
+              },
+            },
+            {
+              text: {
+                query: `${genre}`,
+                path: "generes",
+                fuzzy: {
+                  maxEdits: 2,
+                },
+              },
+            },
+          ],
+        },
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        title: 1,
+        poster: 1,
+        languages: 1,
+        imdb: 1,
+        year: 1,
+        genres: 1,
+        plot: 1,
+        directors: 1,
+        cast: 1,
+        runtime: 1,
+        fullplot: 1,
+        score: { $meta: "searchScore" },
+      },
+    },
+    { $sort: { score: -1 } },
+    {
+      $limit: 20,
+    },
+  ];
+  const movies = mongoUtil.getDB().collection("movies");
+  return movies.aggregate(genresPipeline).toArray();
+}
+
+
+
+
+const getHome = async (req, res) => {
+  const sections = ["Top Rated", "Romance", "Comedy", "Action"];
+  if(!req.query.profileId){
+    res.status(200).json(sections);
+    return;
+  }
+
+  const profile = req.body.profileId;
+  const hist = await getProfileHistory(profile);
+
+  console.log("Calles /Home, profile", profile, "History len: ", hist.length)
+
+  if(hist.length == 0){
+    res.status(200).json(sections);
+    return;
+  }
+
+  
+  
+  if(hist[0].genres.length > 0){
+    const recommended_genre = hist[0].genres[0];
+    if(recommended_genre=="Comedy"){
+      sections[1] = "Comedy";
+      sections[2] = "Romance";
+    }
+    else if(recommended_genre!="Romance"){
+      sections.splice(1, 0, recommended_genre);
+      sections.pop();
+    }
+
+  }
+  
+  const movie_id = hist[0]._id;
+  const movie_name = hist[0].title;
+  sections.push("#Similar to " + movie_name + " #id: "+movie_id);
+  
+
+
+  res.status(200).json(sections);
+}
+
+
+const getSection = async (req, res) => {
+  const section = req.params.name;
+  var movies;
+  if(section == "Top Rated"){
+    movies = await getBestMovies();
+  }
+  else if(section.startsWith("SimilarTo")){
+    const movie_id =  section.substring("SimilarTo".length);
+    console.log("For similar movies in /section: ", movie_id);
+    const _id = ObjectId.createFromHexString(movie_id);
+    movies = await getSimilarMoviesForApp(_id);
+  }
+  else{
+    // Genre based
+    movies = await getMoviesBasedOnGenre(section);
+  }
+  res.status(200).json(movies);
+}
 
 module.exports = { getHome,getRandom, getSection, getHomeData, getHomeDataForApp }

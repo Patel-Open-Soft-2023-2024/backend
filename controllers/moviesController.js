@@ -469,6 +469,7 @@ const getFullVideoLink = async (req, res) => {
       res.status(400).json({ error: "Movie id not provided" });
       return;
     }
+    const movieId = req.body.movieId;
     const movie_id = req.body.movieId;
     if (!req.user) {
       res.status(403).json({ error: "Unauthorized" });
@@ -480,6 +481,21 @@ const getFullVideoLink = async (req, res) => {
       res.status(403).json({ error: "You don't have a subscription" });
       return;
     }
+    const movie = getLink(movieId, subscription);
+    const profileId = req.body.profileId;
+
+    if(profileId){
+      // Add movie to watch history
+      console.log("Adding movie to history . . . . . .")
+      const history = mongoUtil.getDB().collection("History");
+      const result = await history.insertOne({
+        _id: new ObjectId(),
+        Profile_id: profileId,
+        Movie_id: movieId,
+      });
+
+  }
+
     const history = mongoUtil.getDB().collection("History");
     const profileId = req.body.profile;
     console.log({profileId})

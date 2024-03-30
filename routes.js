@@ -2,8 +2,8 @@ const express = require("express");
 const { getHome, getRandom, getSection, getHomeData, getHomeDataForApp } = require("./controllers/homeController");
 const { getFullVideoLink, getMovies, getSimilarMovies, addMovieToWatchlist, removeMovieFromWatchlist, getFavoriteMovies, getMovieVideoById } = require("./controllers/moviesController");
 const { autoComplete, getSemanticSearch } = require("./controllers/searchController");
-const { getUsers, getUserById, updateUser, createUser, deleteUser, addWatchlistToProfile, addHistoryProfile, getAllProfileofaUser, createProfile } = require("./controllers/userController");
-const { signupWithEmailAndPassword, signinWithEmailAndPassword, registerFromNEXTJS } = require("./controllers/firebaseAuthController");
+const { getHistoryforProfile, getUsers, getUserById, updateUser, createUser, deleteUser, addWatchlistToProfile, addHistoryProfile, getAllProfileofaUser, createProfile } = require("./controllers/userController");
+const { signupWithEmailAndPassword, signinWithEmailAndPassword ,registerFromNEXTJS} = require("./controllers/firebaseAuthController");
 const { onSubscribe, redeemSubscription } = require("./controllers/paymentController");
 const { isAuthenticated, test } = require("./middleware/isAuthenticated");
 
@@ -48,7 +48,6 @@ router.post("/getmylist", getFavoriteMovies);
 router.post("/signup", signupWithEmailAndPassword);
 router.post("/login", signinWithEmailAndPassword);
 
-router.post("/addwatchlist", addWatchlistToProfile);  // input-> profile: , movie: ,
 router.post("/homedataforapp", getHomeDataForApp);
 router.post("/addhistory", addHistoryProfile);
 router.get("/getmovievideo", getMovieVideoById);
@@ -68,12 +67,17 @@ router.get("/section/:name", getSection);
 router.post("/subscribe", isAuthenticated, onSubscribe);
 router.post("/redeem", redeemSubscription);
 
-//MOVIE LINK
+// MOVIE LINK
 router.post("/getlink", isAuthenticated, getFullVideoLink);
-router.post('/register/nextjs', registerFromNEXTJS);
-router.post("/favourites/next", isAuthenticated, getFavoriteMovies);
-router.post("/getallprofile/next", isAuthenticated, getAllProfileofaUser);
+router.post('/register/nextjs',registerFromNEXTJS);
 
+// WATCH LIST
+router.post("/addwatchlist", addWatchlistToProfile);  // input-> profile: , movie: ,
+router.post("/favourites/next", isAuthenticated,getFavoriteMovies);
+router.post("/getallprofile/next",isAuthenticated, getAllProfileofaUser);
+
+// HISTORY
+router.get("/history", getHistoryforProfile);
 
 router.get("/private", isAuthenticated, test);
 

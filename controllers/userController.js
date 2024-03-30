@@ -113,10 +113,10 @@ const addHistoryProfile = async (req, res) => {
 const getProfileHistory = async (profileId) => {
   try {
     const history = mongoUtil.getDB().collection("History");
-    const result = await history.find({ Profile_id: profileId }).toArray();
+    const result = await history.find({ Profile_id: profileId }, {$sort: {_id: -1}}).toArray();
     if (result) {
       //RETURNING THE MOVIE DETAIL FROM MOVIE COLLECTION
-      const movie = mongoUtil.getDB().collection("embedded_movies");
+      const movie = mongoUtil.getDB().collection("movies");
       // Get all the movie ids from the result and then get the movie details from the movie collection
       const movieIds = result.map((item) => new ObjectId(item.Movie_id));
       const movieDetails = await movie
@@ -280,5 +280,17 @@ const createProfile = async (req, res) => {
   }
 };
 
+
+const getHistoryforProfile = async (req, res) => {  // input-> profile:
+  const profile = req.query.profileId;
+  if(!profile){
+    res.status(400).json({ error: "Profile not provided" });
+  }
+  const result = await getProfileHistory(profile);
+  res.status(200).json(result);
+}
+
+
+
 //EXPORTING ALL FUNCTIONS
-module.exports = { createUser, getUsers, getUserById, updateUser, getWatchlistOfProfile, getProfileHistory, hexToDecimalUsingMap, deleteUser, addHistoryProfile, addWatchlistToProfile, getAllProfileofaUser, createProfile };
+module.exports = { getHistoryforProfile, createUser, getUsers, getUserById, updateUser, getWatchlistOfProfile, getProfileHistory, hexToDecimalUsingMap, deleteUser, addHistoryProfile, addWatchlistToProfile, getAllProfileofaUser, createProfile };
