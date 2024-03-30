@@ -83,13 +83,11 @@ function insertPreviewLink(movieList) {
 
 const getLink = async (req, res) => {
   try {
-    const objectId = req.params.id;
-    const decimalRepresentation = BigInt("0x" + objectId);
+    const email = req.body.email;
+    const decimalRepresentation = BigInt("0x" + req.body.movieId);
     const hashValue = Number(decimalRepresentation % BigInt(rangeMax));
-
-    res
-      .status(200)
-      .json(movieLinksList[hashValue].getLinkBySubscription("premium"));
+    const tier="premium";//TODO: email -> user -> tier
+    res.status(200).json(movieLinksList[hashValue].getLinkBySubscription(tier));  
   } catch (error) {
     console.error(error);
   }

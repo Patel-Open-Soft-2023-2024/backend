@@ -63,7 +63,7 @@ router.post("/createprofile", createProfile);
 router.post("/subscribe", onSubscribe);
 
 //MOVIE LINK
-router.get("/getlink:id", getLink);
+router.post("/getlink", isAuthenticated,getLink);
 router.post("/redeem", redeemSubscription);
 
 router.get("/private", isAuthenticated, (req, res) => {
