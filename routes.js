@@ -1,43 +1,12 @@
 const express = require("express");
-const {
-  getSimilarMovies,
-  getMovies,
-} = require("./controllers/moviesController");
-const {
-  autoComplete,
-  getSemanticSearch,
-} = require("./controllers/searchController");
-const { isAuthenticated } = require("./middleware/isAuthenticated");
-const {
-    getUsers,
-    getUserById,
-    updateUser,
-    createUser,
-    deleteUser,
-    addMovieToWatchlist,
-    removeMovieFromWatchlist,
-    createOrder,
-    verifyOrder,
-    addHistoryProfile,
-    getHomeData,
-    addWatchlistToProfile,
-    getMovieVideoById,
-    getAllProfileofaUser,
-    getFavoriteMovies,
-    createProfile,
-} = require("./controllers/userController");
-const { publishMessage } = require("./controllers/redisController");
-const {
-  getHome,
-  getRandom,
-  getSection,
-} = require("./controllers/homeController");
-const {
-  signupWithEmailAndPassword,
-  signinWithEmailAndPassword,
-} = require("./controllers/firebaseAuthController");
+const { getHome, getRandom, getSection, getHomeData } = require("./controllers/homeController");
+const { getMovies, getSimilarMovies, addMovieToWatchlist, removeMovieFromWatchlist, getFavoriteMovies, getMovieVideoById } = require("./controllers/moviesController");
+const { autoComplete, getSemanticSearch } = require("./controllers/searchController");
+const { getUsers, getUserById, updateUser, createUser, deleteUser, addWatchlistToProfile, addHistoryProfile, getAllProfileofaUser, createProfile, onSubscribe } = require("./controllers/userController");
+const { signupWithEmailAndPassword, signinWithEmailAndPassword } = require("./controllers/firebaseAuthController");
 const { getLink } = require("./utils/movieLinkUtil");
 const { redeemSubscription } = require("./controllers/paymentController");
+const { isAuthenticated } = require("./middleware/isAuthenticated");
 
 // const { onSubscribe, redeemSubscription } = require('./controllers/paymentController');
 const router = express.Router();
@@ -75,6 +44,7 @@ router.delete("/deleteuser:id", deleteUser);
 router.post("/addmovie:id", addMovieToWatchlist);
 router.post("/removemovie:id", removeMovieFromWatchlist);
 router.get("/favourites", getFavoriteMovies);
+router.post("/getmylist", getFavoriteMovies);
 // router.post("/publish", publishMessage);
 // router.post("/login", login);
 // router.post("/signup", signup);
@@ -99,4 +69,5 @@ router.post("/redeem", redeemSubscription);
 router.get("/private", isAuthenticated, (req, res) => {
   res.json(req.user);
 });
+
 module.exports = router;
