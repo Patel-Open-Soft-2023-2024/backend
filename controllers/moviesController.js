@@ -16,46 +16,74 @@ const getSimilarMovies = async (req, res) => {
   const { id } = req.params;
   console.log(id);
   const _id = ObjectId.createFromHexString(id);
-  const movieDB = mongoUtil.getDB().collection("embedded_movies");
-  const vector_embeddings = await movieDB.find({ _id }).project({ "plot_embedding": 1, "_id": 0 }).toArray();
-  console.log(vector_embeddings)
+  const movieDB = mongoUtil.getDB().collection("movies");
+  const embed_movieDB = mongoUtil.getDB().collection("embedded_movies");
+  const movie_plot = await movieDB.find({ _id }).project({ "fullplot": 1, "_id": 0 }).toArray();
+  console.log(movie_plot);
+  const body = {
+    input: movie_plot[0].fullplot,
+    model: "text-embedding-ada-002",
+  };
+  try {
+    await fetch("https://api.openai.com/v1/embeddings", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.OPEN_API_SECRET}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then(async (response) => {
+        // console.log(response);
+        const embeddings = response.data[0].embedding;
+        // console.log(embeddings);
 
-  const pipeline = [
-    {
-      '$vectorSearch': {
-        'index': 'vector_inde',
-        'path': 'plot_embedding',
-        'queryVector': vector_embeddings[0].plot_embedding,
-        'numCandidates': 150,
-        'limit': 10
-      }
-    }, {
-      '$project': {
-        '_id': 0,
-        'plot': 1,
-        'title': 1,
-        'score': {
-          '$meta': 'vectorSearchScore'
-        },
-        'genres': 1,
-        'poster': 1,
-        'languages': 1,
-        'imdb': 1,
-        'year': 1,
-        'directors': 1,
-        'cast': 1,
-        'runtime': 1,
-        'fullplot': 1,
+        const pipeline = [
+          {
+            '$vectorSearch': {
+              'index': 'vector_inde',
+              'path': 'plot_embedding',
+              'queryVector': embeddings,
+              'numCandidates': 150,
+              'limit': 10
+            }
+          }, {
+            '$project': {
+              '_id': 1,
+              'plot': 1,
+              'title': 1,
+              'score': {
+                '$meta': 'vectorSearchScore'
+              },
+              'genres': 1,
+              'poster': 1,
+              'languages': 1,
+              'imdb': 1,
+              'year': 1,
+              'directors': 1,
+              'cast': 1,
+              'runtime': 1,
+              'fullplot': 1,
 
-      }
-    }
-  ];
-
-  const result = await movieDB.aggregate(pipeline).toArray();
-  console.log(result);
-  res.status(200).json(result)
+            }
+          }
+        ];
+        const result = await embed_movieDB.aggregate(pipeline).toArray();
+        console.log(result);
+        const string_id = _id.toString();
+        // remove the movie with the same id
+        const filteredResult = result.filter((movie) => {
+          return movie._id.toString() !== string_id;
+        });
+        res.status(200).json(filteredResult);
+      })
+  } catch (error) {
+    console.log(error);
+  }
 }
-
 //ADD MOVIE TO USER'S WATCHLIST
 const addMovieToWatchlist = async (req, res) => {
   try {
@@ -351,13 +379,13 @@ const getMovieVideoById = async (req, res) => {
 
 
 const getFavoriteMovies = async (req, res) => {
-  try{
+  try {
     const profile = req.body.profileId;
     console.log(req);
     const result = await getWatchlistOfProfile(profile);
     res.status(200).json(result);
   }
-  catch(error){
+  catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal server error" });
   }
