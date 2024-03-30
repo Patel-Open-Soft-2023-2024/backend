@@ -380,6 +380,7 @@ const getMovieVideoById = async (req, res) => {
 
 const getFavoriteMovies = async (req, res) => {
   try {
+    console.log("fav" ,res.user);
     const profile = req.body.profileId;
     console.log(req);
     const result = await getWatchlistOfProfile(profile);
