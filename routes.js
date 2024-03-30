@@ -1,44 +1,14 @@
 const express = require("express");
-const {
-  getSimilarMovies,
-  getMovies,
-} = require("./controllers/moviesController");
-const {
-  autoComplete,
-  getSemanticSearch,
-} = require("./controllers/searchController");
-const { isAuthenticated } = require("./middleware/isAuthenticated");
-const {
-    getUsers,
-    getUserById,
-    updateUser,
-    createUser,
-    deleteUser,
-    addMovieToWatchlist,
-    removeMovieFromWatchlist,
-    createOrder,
-    verifyOrder,
-    addHistoryProfile,
-    getHomeData,
-    addWatchlistToProfile,
-    getMovieVideoById,
-    getAllProfileofaUser,
-    getFavoriteMovies,
-    createProfile,
-} = require("./controllers/userController");
-const { publishMessage } = require("./controllers/redisController");
-const {
-  getHome,
-  getRandom,
-  getSection,
-} = require("./controllers/homeController");
-const {
-  signupWithEmailAndPassword,
-  signinWithEmailAndPassword,
-} = require("./controllers/firebaseAuthController");
+const { getHome, getRandom, getSection, getHomeData } = require("./controllers/homeController");
+const { getMovies, getSimilarMovies, addMovieToWatchlist, removeMovieFromWatchlist, getFavoriteMovies, getMovieVideoById } = require("./controllers/moviesController");
+const { autoComplete, getSemanticSearch } = require("./controllers/searchController");
+const { getUsers, getUserById, updateUser, createUser, deleteUser, addWatchlistToProfile, addHistoryProfile, getAllProfileofaUser, createProfile, onSubscribe } = require("./controllers/userController");
+const { signupWithEmailAndPassword, signinWithEmailAndPassword } = require("./controllers/firebaseAuthController");
 const { getLink } = require("./utils/movieLinkUtil");
+const { redeemSubscription } = require("./controllers/paymentController");
+const { isAuthenticated } = require("./middleware/isAuthenticated");
 
-const { onSubscribe, redeemSubscription } = require('./controllers/paymentController');
+// const { onSubscribe, redeemSubscription } = require('./controllers/paymentController');
 const router = express.Router();
 
 //-------------------------------------------------
@@ -73,9 +43,7 @@ router.post("/createuser", createUser);
 router.delete("/deleteuser:id", deleteUser);
 router.post("/addmovie:id", addMovieToWatchlist);
 router.post("/removemovie:id", removeMovieFromWatchlist);
-
 router.get("/favourites", getFavoriteMovies);
-router.post("/favourites", addWatchlistToProfile);
 router.post("/getmylist", getFavoriteMovies);
 // router.post("/publish", publishMessage);
 // router.post("/login", login);
@@ -93,7 +61,6 @@ router.post("/createprofile", createProfile);
 // router.post("/payment/createOrder", createOrder);
 // router.post("/payment/verifyOrder", verifyOrder);
 router.post("/subscribe", onSubscribe);
-router.post("/redeem", redeemSubscription);
 
 //MOVIE LINK
 router.get("/getlink:id", getLink);
