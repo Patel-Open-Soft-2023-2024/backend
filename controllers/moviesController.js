@@ -1,6 +1,7 @@
 const { ObjectId } = require("mongodb");
 const mongoUtil = require("../utils/mongoUtil");
 const { insertPreviewLink } = require("../utils/movieLinkUtil");
+const { getWatchlistOfProfile } = require("./userController");
 // const { checkMovie, getMovie, storeMovie } = require("./redisController");
 
 const getMovies = async (req, res) => {
