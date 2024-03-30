@@ -2,6 +2,7 @@ const { ObjectId } = require("mongodb");
 const mongoUtil = require("../utils/mongoUtil");
 const { insertPreviewLink, getLink } = require("../utils/movieLinkUtil");
 const { getWatchlistOfProfile } = require("./userController");
+const e = require("express");
 // const { checkMovie, getMovie, storeMovie } = require("./redisController");
 
 const getMovies = async (req, res) => {
@@ -19,17 +20,17 @@ const getSimilarMovies = async (req, res) => {
   const _id = ObjectId.createFromHexString(id);
   const movieDB = mongoUtil.getDB().collection("movies");
   const embed_movieDB = mongoUtil.getDB().collection("embedded_movies");
-  const movie_plot = await movieDB.find({ _id }).project({ "fullplot": 1, "_id": 0 }).toArray();
-  console.log(movie_plot);
+  let movie_plot = await movieDB.find({ _id }).project({ "fullplot": 1, "plot": 1, "title": 1, "_id": 0 }).toArray();
+  console.log({movie_plot});
   const body = {
-    input: movie_plot[0].fullplot,
+    input: movie_plot[0].fullplot||movie_plot[0].plot||movie_plot[0].title,
     model: "text-embedding-ada-002",
   };
   try {
     await fetch("https://api.openai.com/v1/embeddings", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${process.env.OPEN_API_SECRET}`,
+        "Authorization": `Bearer ${process.env.OPEN_API_SECRET}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(body),
@@ -38,7 +39,7 @@ const getSimilarMovies = async (req, res) => {
         return res.json();
       })
       .then(async (response) => {
-        // console.log(response);
+        console.log({response});
         const embeddings = response.data[0].embedding;
         // console.log(embeddings);
 
@@ -88,11 +89,11 @@ const getSimilarMovies = async (req, res) => {
 
 const getSimilarMoviesForApp = async (_id) => {
   const movieDB = mongoUtil.getDB().collection("movies");
-  const embed_movieDB = mongoUtil.getDB().collection("embedded_movies");
-  const movie_plot = await movieDB.find({ _id }).project({ "fullplot": 1, "_id": 0 }).toArray();
-  console.log(movie_plot);
+  const embed_movieDB = mongoUtil.getDB().collection("movies");
+  const movie_plot = await movieDB.find({ _id }).project({ "fullplot": 1, "plot": 1, "title": 1, "_id": 0 }).toArray();
+  console.log({movie_plot});
   const body = {
-    input: movie_plot[0].fullplot,
+    input: movie_plot[0].fullplot || movie_plot[0].plot || movie_plot[0].title,
     model: "text-embedding-ada-002",
   };
   try {
@@ -108,7 +109,7 @@ const getSimilarMoviesForApp = async (_id) => {
         return res.json();
       })
       .then(async (response) => {
-        // console.log(response);
+        console.log({response});
         const embeddings = response.data[0].embedding;
         // console.log(embeddings);
 
@@ -183,19 +184,21 @@ const addMovieToWatchlist = async (req, res) => {
 //REMOVE MOVIE FROM USER'S WATCHLIST
 const removeMovieFromWatchlist = async (req, res) => {
   try {
-    const users = mongoUtil.getDB().collection("users");
-    const userId = req.params.id;
-    const movie = req.body.movie;
-    const result = await users.updateOne(
-      { _id: new ObjectId(userId) },
-      { $pull: { watchlist: movie } }
-    );
-    if (result.matchedCount) {
+    const watchlist = mongoUtil.getDB().collection("Watch_list");
+    const profileId = req.body.profileId || req.body.profile;
+    const movieId = req.body.movieId || req.body.movie;
+    // delete from watchlist database
+    const result = await watchlist.deleteOne({
+      Profile_id: profileId,
+      Movie_id: movieId,
+    });
+    console.log({result});
+    if (result.acknowledged) {
       res
         .status(200)
         .json({ message: "Movie removed from watchlist successfully" });
     } else {
-      res.status(404).json({ error: "User not found" });
+      res.status(404).json({ error: result });
     }
   } catch (error) {
     console.log(error);
@@ -469,41 +472,19 @@ const getFullVideoLink = async (req, res) => {
       res.status(400).json({ error: "Movie id not provided" });
       return;
     }
-    const movieId = req.body.movieId;
     const movie_id = req.body.movieId;
-    if (!req.user) {
-      res.status(403).json({ error: "Unauthorized" });
-      return;
-    }
+
     const subscription = req.user.Subscription;
 
     if (subscription == 'None') {
       res.status(403).json({ error: "You don't have a subscription" });
       return;
     }
-    const movie = getLink(movieId, subscription);
-    const profileId = req.body.profileId;
 
-    if(profileId){
-      // Add movie to watch history
-      console.log("Adding movie to history . . . . . .")
-      const history = mongoUtil.getDB().collection("History");
-      const result = await history.insertOne({
-        _id: new ObjectId(),
-        Profile_id: profileId,
-        Movie_id: movieId,
-      });
-
-  }
 
     const history = mongoUtil.getDB().collection("History");
-    const profileId = req.body.profile;
-    console.log({profileId})
-    // const result = await profile.insertOne({
-    //   _id: new ObjectId(),
-    //   Profile_id: profileId,
-    //   Movie_id: movie_id,
-    // });
+    const profileId = req.body.profileId;
+
     const result = await history.updateOne(
       {
         Movie_id: movie_id,
@@ -519,7 +500,8 @@ const getFullVideoLink = async (req, res) => {
         upsert: true
       }
     );
-    console.log("added to history", result);
+    console.log("## Updated history for profile: ", profileId, " with movie: ", movie_id);
+    console.log("## added to history", result);
     const movie = getLink(movie_id, subscription);
     res.status(200).json({ video: movie });
   } catch (error) {

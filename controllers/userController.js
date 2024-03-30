@@ -113,7 +113,7 @@ const addHistoryProfile = async (req, res) => {
 const getProfileHistory = async (profileId) => {
   try {
     const history = mongoUtil.getDB().collection("History");
-    const result = await history.find({ Profile_id: profileId }, {$sort: {_id: -1}}).toArray();
+    const result = await history.find({ Profile_id: profileId }).sort({_id: -1}).toArray();
     if (result) {
       //RETURNING THE MOVIE DETAIL FROM MOVIE COLLECTION
       const movie = mongoUtil.getDB().collection("movies");
@@ -149,10 +149,10 @@ const getProfileHistory = async (profileId) => {
 const addWatchlistToProfile = async (req, res) => {
   try {
     const watchlist = mongoUtil.getDB().collection("Watch_list");
+    const profileId = req.body.profile||req.body.profileId;
+    const movie_id = req.body.movie||req.body.movieId;
     console.log("---------------");
-    console.log(req.body.profile);
-    const profileId = req.body.profile;
-    const movieId = req.body.movie;
+    console.log(profileId);
     // const result = await profile.insertOne({
     //   _id: new ObjectId(),
     //   Profile_id: profileId,

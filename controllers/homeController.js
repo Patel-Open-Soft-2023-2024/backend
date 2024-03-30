@@ -262,10 +262,10 @@ const getHome = async (req, res) => {
     return;
   }
 
-  const profile = req.body.profileId;
+  const profile = req.query.profileId;
   const hist = await getProfileHistory(profile);
 
-  console.log("Calles /Home, profile", profile, "History len: ", hist.length)
+  console.log("Calls /Home, profile", profile, "History len: ", hist.length)
 
   if(hist.length == 0){
     res.status(200).json(sections);
@@ -299,6 +299,7 @@ const getHome = async (req, res) => {
 
 const getSection = async (req, res) => {
   const section = req.params.name;
+  console.log("GET /section/"+ section);
   var movies;
   if(section == "Top Rated"){
     movies = await getBestMovies();

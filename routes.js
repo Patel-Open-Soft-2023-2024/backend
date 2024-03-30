@@ -40,7 +40,6 @@ router.post("/updateuser", updateUser);
 router.post("/createuser", createUser);
 router.delete("/deleteuser:id", deleteUser);
 router.post("/addmovie:id", addMovieToWatchlist);
-router.post("/removemovie:id", removeMovieFromWatchlist);
 router.post("/getmylist", getFavoriteMovies);
 // router.post("/publish", publishMessage);
 // router.post("/login", login);
@@ -73,6 +72,7 @@ router.post('/register/nextjs',registerFromNEXTJS);
 
 // WATCH LIST
 router.post("/addwatchlist", addWatchlistToProfile);  // input-> profile: , movie: ,
+router.post("/delwatchlist", removeMovieFromWatchlist);
 router.post("/favourites/next", isAuthenticated,getFavoriteMovies);
 router.post("/getallprofile/next",isAuthenticated, getAllProfileofaUser);
 

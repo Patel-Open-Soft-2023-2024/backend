@@ -81,7 +81,6 @@ function insertPreviewLink(movieList) {
   });
 }
 
-
 const getLink = (movieId, subscription) => {
   console.log("Getting Link for: ", movieId, subscription)
   const decimalRepresentation = BigInt("0x" + movieId);
