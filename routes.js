@@ -23,6 +23,7 @@ const {
     addWatchlistToProfile,
     getMovieVideoById,
     getAllProfileofaUser,
+    getFavoriteMovies,
     createProfile,
 } = require("./controllers/userController");
 const { publishMessage } = require("./controllers/redisController");
