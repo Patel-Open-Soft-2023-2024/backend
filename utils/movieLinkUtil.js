@@ -34,30 +34,30 @@ const oppenheimer = new MovieLinks(
 
 const bigBuckBunny = new MovieLinks(
   "BigBuckBunny/BigBuckBunny_preview.mp4",
-  "BigBuckBunny/BigBuckBunny1080p.m3u8",
-  "BigBuckBunny/BigBuckBunny720p.m3u8",
-  "BigBuckBunny/BigBuckBunny540p.m3u8"
+  "BigBuckBunny/BigBuckBunny_premium.m3u8",
+  "BigBuckBunny/BigBuckBunny_standard.m3u8",
+  "BigBuckBunny/BigBuckBunny_basic.m3u8"
 );
 
 const roadHouse = new MovieLinks(
   "Video/preview_Road_House.mp4",
-  "Video/sample_1080p.m3u8",
-  "Video/sample_720p.m3u8",
-  "Video/sample_540p.m3u8"
+  "Video/sample_premium.m3u8",
+  "Video/sample_standard.m3u8",
+  "Video/sample_basic.m3u8"
 );
 
 const baby_driver = new MovieLinks(
   "baby_driver/baby_driver_preview.mp4",
-  "baby_driver/baby_driver_1080p.m3u8",
-  "baby_driver/baby_driver_720p.m3u8",
-  "baby_driver/baby_driver_540p.m3u8"
+  "baby_driver/baby_driver_premium.m3u8",
+  "baby_driver/baby_driver_standard.m3u8",
+  "baby_driver/baby_driver_basic.m3u8"
 );
 
 const singham = new MovieLinks(
   "singham/singham_preview.mp4",
-  "singham/singham_1080p.m3u8",
-  "singham/singham_720p.m3u8",
-  "singham/singham_540p.m3u8"
+  "singham/singham_premium.m3u8",
+  "singham/singham_standard.m3u8",
+  "singham/singham_basic.m3u8"
 );
 
 // Adding instances to a list
