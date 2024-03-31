@@ -314,6 +314,7 @@ const getSection = async (req, res) => {
     // Genre based
     movies = await getMoviesBasedOnGenre(section);
   }
+  insertPreviewLink(movies);
   res.status(200).json(movies);
 }
 
