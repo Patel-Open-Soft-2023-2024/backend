@@ -89,7 +89,7 @@ const getSimilarMovies = async (req, res) => {
 
 const getSimilarMoviesForApp = async (_id) => {
   const movieDB = mongoUtil.getDB().collection("movies");
-  const embed_movieDB = mongoUtil.getDB().collection("movies");
+  const embed_movieDB = mongoUtil.getDB().collection("embedded_movies");
   const movie_plot = await movieDB.find({ _id }).project({ "fullplot": 1, "plot": 1, "title": 1, "_id": 0 }).toArray();
   console.log({movie_plot});
   const body = {
