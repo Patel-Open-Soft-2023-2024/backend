@@ -9,7 +9,7 @@ Assuming you know about git and have it <a href="https://git-scm.com/downloads">
 
 1. Assuming the git is set correctly and you have access to read this repository, clone this repo via the command:
 ```
-git clone https://github.com/Patel-Open-Soft-2023-2024/backend.git
+git clone <repo http link>
 ```
 2. Move to the root directory and run the command:
 ```
